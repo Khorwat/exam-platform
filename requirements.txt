@@ -1,0 +1,15 @@
+celery>=5.3.4
+django-celery-beat>=2.5.0
+drf-spectacular>=0.26.5
+gunicorn>=21.2.0
+whitenoise>=6.6.0
+Django>=4.2
+djangorestframework
+djangorestframework-simplejwt
+django-cors-headers
+python-decouple
+django-redis
+psycopg2-binary
+django-filter
+Pillow
+numpy

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - ExamPortal</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-dark: #4338CA;
+            --primary-light: #EEF2FF;
+            --secondary: #64748B;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --dark: #0F172A;
+            --light: #F8FAFC;
+
+            --surface: #FFFFFF;
+            --border: #E2E8F0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+            min-height: 100vh;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: #7e22ce !important;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .brand-icon {
+            background: linear-gradient(135deg, #a855f7, #7e22ce);
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-link {
+            color: var(--secondary) !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem !important;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--primary) !important;
+            background: var(--primary-light);
+        }
+
+        /* Profile Card */
+        .profile-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);
+            padding: 2rem;
+            color: white;
+            text-align: center;
+            position: relative;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: white;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            margin: 0 auto 1rem;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .profile-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .profile-role {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .profile-body {
+            padding: 2rem;
+        }
+
+        .form-section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--dark);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .btn-save {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .btn-save:hover {
+            background: var(--primary-dark);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/frontend/index.html">
+                <div class="brand-icon rounded p-1 me-1">
+                    <i class="bi bi-mortarboard-fill text-white"></i>
+                </div>
+                <span>IT College<br><small class="fw-normal opacity-75"
+                        style="font-size: 0.6rem; display: block; line-height: 1;">Student Portal</small></span>
+            </a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/frontend/index.html">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/frontend/exams.html">My Exams</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/frontend/results.html">Results</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="profile-card">
+                    <!-- Header -->
+                    <div class="profile-header">
+                        <div class="profile-avatar position-relative">
+                            <img id="avatar-img" src="" alt="Profile" class="d-none w-100 h-100 rounded-circle"
+                                style="object-fit: cover;">
+                            <i class="bi bi-person" id="avatar-icon"></i>
+
+                            <label for="profile_picture"
+                                class="position-absolute bottom-0 end-0 bg-white text-primary rounded-circle shadow-sm border p-2 mb-0"
+                                style="width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;"
+                                title="Change Photo">
+                                <i class="bi bi-camera-fill" style="font-size: 1rem;"></i>
+                            </label>
+                            <input type="file" id="profile_picture" accept="image/*" class="d-none"
+                                onchange="previewImage(this)">
+                        </div>
+                        <h1 class="profile-name" id="display-name">Loading...</h1>
+                        <div class="profile-role" id="display-role">Student</div>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="profile-body">
+                        <div id="alert-container"></div>
+
+                        <form id="profile-form">
+                            <div class="form-section-title">Personal Information</div>
+
+                            <div class="row">
+                                <div class="col-md-6 form-group">
+                                    <label for="first_name" class="form-label">First Name</label>
+                                    <input type="text" class="form-control" id="first_name" required>
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label for="last_name" class="form-label">Last Name</label>
+                                    <input type="text" class="form-control" id="last_name" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="username" class="form-label">Username</label>
+                                <input type="text" class="form-control bg-light" id="username" readonly>
+                                <small class="text-muted">Username cannot be changed.</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="email" required>
+                            </div>
+
+                            <!-- Change Password Section (Optional Expansion) -->
+                            <div class="form-section-title mt-4">Security</div>
+
+                            <div class="row">
+                                <div class="col-md-6 form-group">
+                                    <label for="new_password" class="form-label">New Password (leave blank to keep
+                                        current)</label>
+                                    <input type="password" class="form-control" id="new_password"
+                                        placeholder="Min. 8 characters">
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-end mt-4">
+                                <button type="submit" class="btn-save" id="saveBtn">
+                                    <span class="btn-text">Save Changes</span>
+                                    <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!utils.isAuthenticated()) {
+                window.location.href = '/frontend/login.html';
+                return;
+            }
+
+            try {
+                // Fetch User Profile
+                // Use API.auth.getProfile() if available, otherwise fallback to local storage
+                // We'll rely on what's in api.js 
+                // api.js has getProfile!
+                const user = await API.auth.getProfile();
+
+                // Populate Form
+                document.getElementById('display-name').textContent = `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.username;
+                document.getElementById('display-role').textContent = user.role || 'Student';
+
+                document.getElementById('username').value = user.username;
+                document.getElementById('email').value = user.email || '';
+                document.getElementById('first_name').value = user.first_name || '';
+                document.getElementById('last_name').value = user.last_name || '';
+
+                if (user.profile_picture) {
+                    document.getElementById('avatar-img').src = user.profile_picture;
+                    document.getElementById('avatar-img').classList.remove('d-none');
+                    document.getElementById('avatar-icon').classList.add('d-none');
+                }
+
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                utils.showAlert('Failed to load profile data.', 'danger');
+            }
+        });
+
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('avatar-img').src = e.target.result;
+                    document.getElementById('avatar-img').classList.remove('d-none');
+                    document.getElementById('avatar-icon').classList.add('d-none');
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        document.getElementById('profile-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('saveBtn');
+            const btnText = submitBtn.querySelector('.btn-text');
+            const spinner = submitBtn.querySelector('.spinner-border');
+            const fileInput = document.getElementById('profile_picture');
+
+            // UI Loading
+            submitBtn.disabled = true;
+            btnText.textContent = 'Saving...';
+            spinner.classList.remove('d-none');
+            if (typeof utils !== 'undefined' && utils.clearAlerts) utils.clearAlerts();
+
+            try {
+                let data;
+                if (fileInput.files.length > 0) {
+                    data = new FormData();
+                    data.append('first_name', document.getElementById('first_name').value);
+                    data.append('last_name', document.getElementById('last_name').value);
+                    data.append('email', document.getElementById('email').value);
+                    data.append('profile_picture', fileInput.files[0]);
+
+                    const newPass = document.getElementById('new_password').value;
+                    if (newPass) data.append('password', newPass);
+                } else {
+                    data = {
+                        first_name: document.getElementById('first_name').value,
+                        last_name: document.getElementById('last_name').value,
+                        email: document.getElementById('email').value
+                    };
+                    const newPass = document.getElementById('new_password').value;
+                    if (newPass) data.password = newPass;
+                }
+
+                const updatedUser = await API.auth.updateProfile(data);
+
+                // Update header immediately
+                document.getElementById('display-name').textContent = `${updatedUser.first_name || ''} ${updatedUser.last_name || ''}`.trim() || updatedUser.username;
+
+                // Update avatar if changed
+                if (updatedUser.profile_picture) {
+                    document.getElementById('avatar-img').src = updatedUser.profile_picture;
+                    document.getElementById('avatar-img').classList.remove('d-none');
+                    document.getElementById('avatar-icon').classList.add('d-none');
+                }
+
+                utils.showAlert('Profile updated successfully!', 'success');
+                document.getElementById('new_password').value = '';
+
+            } catch (error) {
+                console.error('Update failed:', error);
+                utils.showAlert(error.message || 'Failed to update profile.', 'danger');
+            } finally {
+                submitBtn.disabled = false;
+                btnText.textContent = 'Save Changes';
+                spinner.classList.add('d-none');
+            }
+        });
+    </script>
+</body>
+
+</html>

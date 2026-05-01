@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Results - Online Examination Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        :root {
+            --primary: #4f46e5;
+        }
+
+        .stat-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .avatar-initials {
+            width: 36px;
+            height: 36px;
+            background-color: #e0e7ff;
+            color: #4f46e5;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .table-custom th {
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            color: #64748b;
+            background-color: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .table-custom td {
+            vertical-align: middle;
+            font-size: 0.95rem;
+        }
+
+        .progress-slim {
+            height: 6px;
+            border-radius: 3px;
+            background-color: #f1f5f9;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+
+        .search-box input {
+            padding-left: 38px;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-secondary border-opacity-25">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="/frontend/index.html"
+                style="font-weight: 700; letter-spacing: -0.5px;">
+                <div class="rounded p-1" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">
+                    <i class="bi bi-mortarboard-fill text-white"></i>
+                </div>
+                <span>IT College<br><small class="fw-normal opacity-75"
+                        style="font-size: 0.65rem; display: block; line-height: 1;">Academic Management</small></span>
+            </a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/frontend/admin.html">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/frontend/admin-exams.html">Exams</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/frontend/admin-analytics.html">Analytics</a>
+                    </li>
+                    <li class="nav-item admin-only">
+                        <a class="nav-link" href="/frontend/admin-users.html">Users</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/frontend/grading.html">Grading</a>
+                    </li>
+                    <li class="nav-item ms-3">
+                        <a class="btn btn-sm btn-outline-danger" href="#"
+                            onclick="event.preventDefault(); window.logout();">Sign Out</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container my-5">
+        <!-- Hero Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <a href="/frontend/admin-exams.html" class="text-decoration-none text-muted small mb-1 d-block">
+                    <i class="bi bi-arrow-left"></i> Back to Exams
+                </a>
+                <div class="d-flex align-items-center gap-3">
+                    <h2 class="fw-bold mb-0" id="heroTitle">Loading...</h2>
+                    <span class="badge bg-success rounded-pill px-3" id="heroStatus">Active</span>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-white border shadow-sm" onclick="exportCSV()">
+                    <i class="bi bi-download me-2"></i>Export CSV
+                </button>
+                <button class="btn btn-primary" onclick="goToGrading()">
+                    <i class="bi bi-check-circle me-2"></i>Review All
+                </button>
+            </div>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-3">
+                <div class="card stat-card p-3 h-100">
+                    <div class="text-secondary small text-uppercase fw-bold mb-2">Total Attempts</div>
+                    <div class="d-flex align-items-baseline">
+                        <h2 class="mb-0 fw-bold" id="kpiTotal">0</h2>
+                        <small class="text-muted ms-2">students</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card p-3 h-100">
+                    <div class="text-secondary small text-uppercase fw-bold mb-2">Average Score</div>
+                    <div class="d-flex align-items-baseline">
+                        <h2 class="mb-0 fw-bold text-primary" id="kpiAvg" id="kpiAvgValue">0%</h2>
+                    </div>
+                    <div class="progress progress-slim mt-2">
+                        <div class="progress-bar bg-primary" id="kpiAvgBar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card p-3 h-100">
+                    <div class="text-secondary small text-uppercase fw-bold mb-2">Pass Rate</div>
+                    <div class="d-flex align-items-baseline">
+                        <h2 class="mb-0 fw-bold text-success" id="kpiPass">0%</h2>
+                    </div>
+                    <div class="progress progress-slim mt-2">
+                        <div class="progress-bar bg-success" id="kpiPassBar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card p-3 h-100">
+                    <div class="text-secondary small text-uppercase fw-bold mb-2">Pending Review</div>
+                    <div class="d-flex align-items-baseline">
+                        <h2 class="mb-0 fw-bold text-warning" id="kpiPending">0</h2>
+                        <small class="text-muted ms-2">papers</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Grid -->
+        <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+            <div class="card-header bg-white p-3 border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold">Student Results</h5>
+                <div class="d-flex gap-2">
+                    <div class="search-box">
+                        <i class="bi bi-search"></i>
+                        <input type="text" class="form-control form-control-sm" placeholder="Search student..."
+                            id="tableSearch" onkeyup="renderTable()">
+                    </div>
+                    <select class="form-select form-select-sm" style="width: 150px;" id="tableFilter"
+                        onchange="renderTable()">
+                        <option value="all">All Status</option>
+                        <option value="passed">Passed</option>
+                        <option value="failed">Failed</option>
+                        <option value="submitted">Pending Review</option>
+                    </select>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-custom table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">Student</th>
+                            <th>Status</th>
+                            <th style="width: 20%;">Score</th>
+                            <th>Time & Date</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsTableBody">
+                        <!-- JS Injection -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="emptyState" class="text-center p-5 d-none">
+                <p class="text-muted">No results found matching your criteria.</p>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/app.js"></script>
+    <script>
+        let examId = null;
+        let examData = null;
+        let sessionsData = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!utils.requireAuth()) return;
+
+            const params = new URLSearchParams(window.location.search);
+            examId = params.get('exam_id');
+
+            if (!examId) {
+                alert('No exam specified');
+                window.location.href = '/frontend/admin-exams.html';
+                return;
+            }
+
+            await loadData();
+        });
+
+        async function loadData() {
+            try {
+                // Parallel fetch for speed
+                const [examRes, sessionsRes] = await Promise.all([
+                    API.exams.get(examId),
+                    API.request(`/examinations/sessions/?exam_id=${examId}`)
+                ]);
+
+                examData = examRes;
+                sessionsData = sessionsRes.results || sessionsRes;
+
+                renderHeader();
+                calculateStats();
+                renderTable();
+
+            } catch (error) {
+                console.error(error);
+                utils.showAlert('Error loading results: ' + error.message, 'danger');
+            }
+        }
+
+        function renderHeader() {
+            document.getElementById('heroTitle').textContent = examData.title;
+            const badge = document.getElementById('heroStatus');
+            if (examData.is_active) {
+                badge.classList.add('bg-success');
+                badge.textContent = 'Active';
+            } else {
+                badge.classList.remove('bg-success');
+                badge.classList.add('bg-secondary');
+                badge.textContent = 'Draft';
+            }
+        }
+
+        function calculateStats() {
+            const total = sessionsData.length;
+            if (total === 0) return;
+
+            // Filter for finished exams only for score stats
+            const finished = sessionsData.filter(s => s.status === 'completed' || s.status === 'graded');
+            const finishedCount = finished.length;
+
+            const pending = sessionsData.filter(s => s.status === 'submitted').length;
+
+            let sumScore = 0;
+            let passedCount = 0;
+
+            finished.forEach(s => {
+                const score = s.result ? s.result.percentage_score : 0;
+                sumScore += parseFloat(score);
+                if (s.result && s.result.passed) passedCount++;
+            });
+
+            const avg = finishedCount > 0 ? (sumScore / finishedCount) : 0;
+            const passRate = finishedCount > 0 ? (passedCount / finishedCount * 100) : 0;
+
+            // DOM Updates
+            document.getElementById('kpiTotal').textContent = total;
+            document.getElementById('kpiAvg').textContent = avg.toFixed(1) + '%';
+            document.getElementById('kpiAvgBar').style.width = avg + '%';
+
+            document.getElementById('kpiPass').textContent = passRate.toFixed(1) + '%';
+            document.getElementById('kpiPassBar').style.width = passRate + '%';
+
+            document.getElementById('kpiPending').textContent = pending;
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('resultsTableBody');
+            const search = document.getElementById('tableSearch').value.toLowerCase();
+            const filter = document.getElementById('tableFilter').value;
+
+            const filtered = sessionsData.filter(s => {
+                const matchesName = (s.student.username || '').toLowerCase().includes(search);
+
+                let matchesStatus = true;
+                if (filter === 'submitted') matchesStatus = s.status === 'submitted';
+                if (filter === 'passed') matchesStatus = s.result && s.result.passed;
+                if (filter === 'failed') matchesStatus = s.result && !s.result.passed;
+
+                return matchesName && matchesStatus;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '';
+                document.getElementById('emptyState').classList.remove('d-none');
+                return;
+            }
+
+            document.getElementById('emptyState').classList.add('d-none');
+
+            tbody.innerHTML = filtered.map(s => {
+                const initials = (s.student.username || 'S').substring(0, 2).toUpperCase();
+                const score = s.result ? s.result.percentage_score : 0;
+                const passing = examData.passing_score;
+                const isPass = score >= passing;
+                const statusColor = s.status === 'completed' || s.status === 'graded'
+                    ? (isPass ? 'success' : 'danger')
+                    : (s.status === 'submitted' ? 'warning' : 'secondary');
+
+                const scoreColor = isPass ? 'success' : 'danger';
+
+                return `
+                    <tr>
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="avatar-initials">${initials}</div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold text-dark">${s.student.username}</h6>
+                                    <small class="text-muted">${s.student.email || 'No email'}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-${statusColor}-subtle text-${statusColor} rounded-pill text-uppercase" style="font-size: 0.7rem;">
+                                ${s.status === 'graded' ? (isPass ? 'Passed' : 'Failed') : s.status}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center justify-content-between mb-1">
+                                <span class="fw-bold ${s.status === 'submitted' ? 'text-muted' : ''}">${s.status === 'submitted' ? 'Pending' : score + '%'}</span>
+                            </div>
+                            <div class="progress" style="height: 4px;">
+                                <div class="progress-bar bg-${scoreColor}" style="width: ${score}%"></div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="small text-dark">${new Date(s.start_time).toLocaleDateString()}</div>
+                            <small class="text-muted">Submitted: ${s.end_time ? new Date(s.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-'}</small>
+                        </td>
+                        <td class="text-end pe-4">
+                            <a href="/frontend/grading.html?exam_id=${examId}&student=${s.student.id}" class="btn btn-sm btn-outline-primary fw-bold">
+                                <i class="bi bi-pencil-square"></i> Review
+                            </a>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function exportCSV() {
+            // Simple Client-side CSV export
+            let csv = 'Student ID,Student Name,Score,Passed,Status,Start Time,End Time\n';
+            sessionsData.forEach(s => {
+                const score = s.result ? s.result.percentage_score : 0;
+                const passed = s.result ? s.result.passed : false;
+                csv += `${s.student.id},${s.student.username},${score},${passed},${s.status},${s.start_time},${s.end_time}\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', `results_${examData.title}.csv`);
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function goToGrading() {
+            window.location.href = `/frontend/grading.html?exam_id=${examId}`;
+        }
+    </script>
+</body>
+
+</html>

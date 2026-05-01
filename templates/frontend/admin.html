@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | IT College</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons & Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --font-heading: 'Plus Jakarta Sans', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --sidebar-width: 280px;
+            --sidebar-bg: #0f172a;
+            --accent-primary: #6366f1;
+            /* Default Instructor */
+            --accent-admin: #f59e0b;
+            /* Admin Gold */
+            --bg-light: #f8fafc;
+            --text-dark: #1e293b;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-light);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            color: #94a3b8;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 1000;
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+
+        .brand-section {
+            padding: 0 0.75rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: white;
+            font-family: var(--font-heading);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-icon {
+            background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+            transition: all 0.3s;
+        }
+
+        body.admin-mode .nav-item-link.active {
+            background: var(--accent-admin);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+            color: #fff;
+        }
+
+        .nav-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .nav-item-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            color: #94a3b8;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .nav-item-link:hover,
+        .nav-item-link.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-item-link.active {
+            background: var(--accent-primary);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Custom Hover Colors */
+        .nav-link-admin:hover,
+        .nav-link-admin.active {
+            background: rgba(245, 158, 11, 0.15) !important;
+            color: #f59e0b !important;
+        }
+
+        .nav-link-academic:hover,
+        .nav-link-academic.active {
+            background: rgba(56, 189, 248, 0.15) !important;
+            color: #38bdf8 !important;
+            /* Sky Blue */
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 2rem;
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        /* Header */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title h1 {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1.75rem;
+            color: var(--text-dark);
+            margin: 0;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .user-profile:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .action-card {
+            background: white;
+            padding: 1.25rem;
+            border-radius: 1rem;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-decoration: none;
+            color: var(--text-dark);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .action-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1);
+            border-color: var(--accent-primary);
+        }
+
+        body.admin-mode .action-card:hover {
+            border-color: var(--accent-admin);
+        }
+
+        .action-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        /* Statistics */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            font-family: var(--font-heading);
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Recent Activity */
+        .content-panel {
+            background: white;
+            border-radius: 1rem;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .panel-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title {
+            font-family: var(--font-heading);
+            font-weight: 600;
+            margin: 0;
+            color: var(--text-dark);
+        }
+
+        /* Activity List */
+        .activity-item {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: start;
+            gap: 1rem;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        /* Command Center Link */
+        .nav-command {
+            background: linear-gradient(45deg, #ef4444, #b91c1c);
+            color: white !important;
+            margin-top: 2rem;
+        }
+
+        .nav-command:hover {
+            opacity: 0.9;
+        }
+
+        @media (max-width: 991px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .mobile-toggle {
+                display: block !important;
+            }
+        }
+    </style>
+    <!-- Anti-flicker for Admin Sidebar -->
+    <script>
+        if (localStorage.getItem('user_role') === 'administrator') {
+            document.documentElement.classList.add('admin-mode-active');
+            document.write('<style>.admin-only { display: block !important; }</style>');
+        }
+    </script>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="brand-section">
+            <div class="brand-icon rounded p-1">
+                <i class="bi bi-mortarboard-fill fs-4 text-white"></i>
+            </div>
+            <span>IT College<br><small class="fw-normal opacity-75" style="font-size: 0.7rem">System
+                    Administration</small></span>
+        </div>
+
+        <div class="nav-section flex-grow-1 overflow-y-auto"
+            style="scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.2) transparent;">
+            <div class="d-flex flex-column gap-1">
+                <small class="text-uppercase fw-bold px-3 mb-2 mt-2 text-muted"
+                    style="font-size: 0.7rem; letter-spacing: 1px;">Administration</small>
+                <a href="/frontend/admin.html" class="nav-item-link nav-link-admin active">
+                    <i class="bi bi-grid-1x2-fill"></i> Dashboard
+                </a>
+
+                <!-- Admin Only Section -->
+                <div class="admin-only">
+                    <a href="/frontend/admin-users.html" class="nav-item-link nav-link-admin">
+                        <i class="bi bi-people-fill"></i> Users
+                    </a>
+                    <a href="/frontend/admin-announcements.html" class="nav-item-link nav-link-admin">
+                        <i class="bi bi-megaphone-fill"></i> Announcements
+                    </a>
+                    <a href="/frontend/admin-logs.html" class="nav-item-link nav-link-admin">
+                        <i class="bi bi-shield-lock-fill"></i> Logs
+                    </a>
+                    <a href="/frontend/admin-settings.html" class="nav-item-link nav-link-admin">
+                        <i class="bi bi-gear-fill"></i> Settings
+                    </a>
+                </div>
+
+                <small class="text-uppercase fw-bold px-3 mb-2 mt-3 text-info"
+                    style="font-size: 0.7rem; letter-spacing: 1px;">Academic</small>
+                <a href="/frontend/admin-exams.html" class="nav-item-link nav-link-academic">
+                    <i class="bi bi-file-earmark-text text-info"></i> Exams
+                </a>
+                <a href="/frontend/admin-questions.html" class="nav-item-link nav-link-academic">
+                    <i class="bi bi-hdd-stack-fill text-info"></i> Question Bank
+                </a>
+                <a href="/frontend/admin-analytics.html" class="nav-item-link nav-link-academic">
+                    <i class="bi bi-bar-chart-fill text-info"></i> Analytics
+                </a>
+                <a href="/frontend/grading.html" class="nav-item-link nav-link-academic">
+                    <i class="bi bi-check-circle text-info"></i> Grading
+                </a>
+                <a href="/frontend/admin-monitor.html" class="nav-item-link nav-link-academic"
+                    style="color: #ef4444 !important;">
+                    <i class="bi bi-camera-video-fill" style="color: #ef4444 !important;"></i> Live Command
+                </a>
+            </div>
+        </div>
+
+        <div class="mt-auto pt-3 border-top border-secondary border-opacity-25">
+            <a href="#" onclick="window.utils ? window.utils.logout() : window.location.href='/frontend/login.html'"
+                class="nav-item-link text-danger">
+                <i class="bi bi-box-arrow-left"></i> Sign Out
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Mobile Toggle -->
+        <button class="btn btn-dark d-lg-none mb-3 mobile-toggle" style="display:none">
+            <i class="bi bi-list"></i> Menu
+        </button>
+
+        <header class="dashboard-header">
+            <div class="page-title">
+                <p class="text-secondary mb-1 small fw-medium text-uppercase" id="dashboard-subtitle">Instructor
+                    Overview</p>
+                <h1 id="dashboard-title">Dashboard</h1>
+            </div>
+
+            <div class="dropdown">
+                <a href="#" class="text-decoration-none d-flex align-items-center gap-2" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    <div class="user-profile">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
+                            style="width: 32px; height: 32px; overflow: hidden;">
+                            <img id="header-avatar" src="" class="w-100 h-100 d-none" style="object-fit:cover;">
+                            <i class="bi bi-person-fill" id="header-icon"></i>
+                        </div>
+                        <div>
+                            <span class="d-block fw-bold text-dark small" id="user-name">User</span>
+                        </div>
+                    </div>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2">
+                    <li><a class="dropdown-item py-2" href="/frontend/profile.html"><i class="bi bi-person me-2"></i>My
+                            Profile</a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item py-2 text-danger" href="#"
+                            onclick="window.utils ? window.utils.logout() : window.location.href='/frontend/login.html'"><i
+                                class="bi bi-box-arrow-right me-2"></i>Sign Out</a></li>
+                </ul>
+            </div>
+        </header>
+
+        <!-- Dynamic Quick Actions -->
+        <div class="quick-actions" id="quick-actions">
+            <!-- Injected via JS -->
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="stat-label">Total Exams</div>
+                        <div class="stat-value" id="total-exams">-</div>
+                    </div>
+                    <div class="text-primary fs-3 bg-primary bg-opacity-10 rounded p-2 d-flex align-items-center justify-content-center"
+                        style="width:48px;height:48px"><i class="bi bi-file-text"></i></div>
+                </div>
+                <!-- <div class="small text-success mt-2"><i class="bi bi-arrow-up-short"></i> 12% vs last month</div> -->
+            </div>
+
+            <div class="stat-card">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="stat-label">Questions</div>
+                        <div class="stat-value" id="total-questions">-</div>
+                    </div>
+                    <div class="text-info fs-3 bg-info bg-opacity-10 rounded p-2 d-flex align-items-center justify-content-center"
+                        style="width:48px;height:48px"><i class="bi bi-collection"></i></div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="stat-label">Active Sessions</div>
+                        <div class="stat-value" id="active-sessions">-</div>
+                    </div>
+                    <div class="text-warning fs-3 bg-warning bg-opacity-10 rounded p-2 d-flex align-items-center justify-content-center"
+                        style="width:48px;height:48px"><i class="bi bi-broadcast"></i></div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="stat-label">Completed</div>
+                        <div class="stat-value" id="completed-exams">-</div>
+                    </div>
+                    <div class="text-success fs-3 bg-success bg-opacity-10 rounded p-2 d-flex align-items-center justify-content-center"
+                        style="width:48px;height:48px"><i class="bi bi-check-circle"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Layout Split for Admin/Instructors -->
+        <div class="row g-4">
+            <!-- Recent Activity / Items -->
+            <div class="col-lg-8">
+                <div class="content-panel">
+                    <div class="panel-header">
+                        <h5 class="panel-title" id="activity-title">Recent Activity</h5>
+                        <button class="btn btn-sm btn-outline-secondary rounded-pill px-3">View All</button>
+                    </div>
+                    <div id="recent-activity-list">
+                        <div class="text-center py-5 text-muted">
+                            <div class="spinner-border spinner-border-sm text-primary mb-2"></div>
+                            <p class="small">Loading activity...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Status (Admin) or Quick Tips (Instructor) -->
+            <div class="col-lg-4">
+                <div class="content-panel bg-light border-0">
+                    <div class="p-4" id="side-panel-content">
+                        <!-- Injected via JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/api.js?v=3"></script>
+    <script src="/static/js/app.js?v=3"></script>
+    <script>
+        async function loadDashboard() {
+            if (!utils.isAuthenticated()) return;
+
+            try {
+                // 1. Identify User Role
+                const user = await API.auth.getProfile();
+                if (user.role) localStorage.setItem('user_role', user.role);
+                const isAdmin = user.role === 'administrator';
+                const isInstructor = user.role === 'instructor';
+
+                // Update Profile UI
+                if (user.first_name) document.getElementById('user-name').textContent = `${user.first_name} ${user.last_name}`;
+                if (user.profile_picture) {
+                    const img = document.getElementById('header-avatar');
+                    img.src = user.profile_picture;
+                    img.classList.remove('d-none');
+                    document.getElementById('header-icon').classList.add('d-none');
+                }
+
+                // 2. Adjust Interface based on Role
+                if (isAdmin) {
+                    document.body.classList.add('admin-mode');
+                    document.getElementById('dashboard-subtitle').textContent = 'System Administration';
+                    document.getElementById('dashboard-title').textContent = 'Admin Command Center';
+                    document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('d-none'));
+
+                    // Render Admin Quick Actions
+                    document.getElementById('quick-actions').innerHTML = `
+                        <a href="/frontend/admin-users.html" class="action-card">
+                            <div class="action-icon bg-primary bg-opacity-10 text-primary">
+                                <i class="bi bi-person-plus-fill"></i>
+                            </div>
+                            <div><div class="fw-bold">Add User</div><div class="small text-muted">Manage access</div></div>
+                        </a>
+                        <a href="/frontend/admin-logs.html" class="action-card">
+                            <div class="action-icon bg-warning bg-opacity-10 text-warning">
+                                <i class="bi bi-shield-exclamation"></i>
+                            </div>
+                            <div><div class="fw-bold">Security Logs</div><div class="small text-muted">Audit system</div></div>
+                        </a>
+                        <a href="/frontend/admin-settings.html" class="action-card">
+                            <div class="action-icon bg-secondary bg-opacity-10 text-secondary">
+                                <i class="bi bi-sliders"></i>
+                            </div>
+                            <div><div class="fw-bold">Global Config</div><div class="small text-muted">System settings</div></div>
+                        </a>
+                        <a href="/frontend/admin-monitor.html" class="action-card">
+                            <div class="action-icon bg-danger bg-opacity-10 text-danger">
+                                <i class="bi bi-activity"></i>
+                            </div>
+                            <div><div class="fw-bold">Live Monitor</div><div class="small text-muted">Active exams</div></div>
+                        </a>
+                    `;
+
+                    // Render System Status Side Panel
+                    document.getElementById('side-panel-content').innerHTML = `
+                        <h6 class="fw-bold mb-3 text-dark">System Health</h6>
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="small text-muted">Server Status</span>
+                            <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">Operational</span>
+                        </div>
+                         <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="small text-muted">Database</span>
+                            <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">Connected</span>
+                        </div>
+                         <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="small text-muted">Last Backup</span>
+                            <span class="small fw-bold">2 hours ago</span>
+                        </div>
+                        <hr class="my-4">
+                        <div class="alert alert-info border-0 shadow-sm mb-0">
+                            <div class="d-flex gap-2">
+                                <i class="bi bi-info-circle-fill mt-1"></i>
+                                <div>
+                                    <h6 class="fw-bold mb-1">Update Available</h6>
+                                    <p class="small mb-0">System version 2.1 is ready. Check settings.</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                } else {
+                    // Instructor Actions
+                    document.getElementById('quick-actions').innerHTML = `
+                         <a href="/frontend/admin-exams.html" class="action-card">
+                            <div class="action-icon bg-primary bg-opacity-10 text-primary"><i class="bi bi-plus-lg"></i></div>
+                            <div><div class="fw-bold">Create Exam</div><div class="small text-muted">New assessment</div></div>
+                        </a>
+                        <a href="/frontend/admin-monitor.html" class="action-card">
+                            <div class="action-icon bg-danger bg-opacity-10 text-danger"><i class="bi bi-camera-video"></i></div>
+                            <div><div class="fw-bold">Monitor Live</div><div class="small text-muted">Watch exam</div></div>
+                        </a>
+                        <a href="/frontend/grading.html" class="action-card">
+                            <div class="action-icon bg-success bg-opacity-10 text-success"><i class="bi bi-check-all"></i></div>
+                            <div><div class="fw-bold">Grading</div><div class="small text-muted">Review answers</div></div>
+                        </a>
+                    `;
+
+                    document.getElementById('side-panel-content').innerHTML = `
+                        <h6 class="fw-bold mb-3">Quick Tips</h6>
+                        <ul class="list-unstyled small text-secondary d-flex flex-column gap-3">
+                            <li class="d-flex gap-2"><i class="bi bi-lightbulb text-warning"></i> Use the Question Bank to reuse questions across exams.</li>
+                            <li class="d-flex gap-2"><i class="bi bi-lightbulb text-warning"></i> Enable "Shuffle Questions" to reduce cheating.</li>
+                            <li class="d-flex gap-2"><i class="bi bi-lightbulb text-warning"></i> Check Analytics to identify difficult topics.</li>
+                        </ul>
+                    `;
+                }
+
+                // 3. Load Stats Data
+                const [exams, questions, sessions, results] = await Promise.all([
+                    API.exams.list(),
+                    API.questions.list(),
+                    API.examinations.getSessions(),
+                    API.results.list()
+                ]);
+
+                // Update Counts
+                const examList = exams.results || exams || [];
+                document.getElementById('total-exams').textContent = examList.length;
+                document.getElementById('total-questions').textContent = (questions.results || questions || []).length;
+
+                const sessionList = sessions.results || sessions || [];
+                const activeCount = sessionList.filter(s => s.status === 'in_progress').length;
+                document.getElementById('active-sessions').textContent = activeCount;
+
+                const resultList = results.results || results || [];
+                document.getElementById('completed-exams').textContent = resultList.length;
+
+                // 4. Recent Activity (Mocked for now depending on API availability)
+                // We'll use the most recent results or sessions to populate this
+                const activityList = document.getElementById('recent-activity-list');
+                const recentItems = [...sessionList, ...resultList]
+                    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                    .slice(0, 5);
+
+                if (recentItems.length > 0) {
+                    activityList.innerHTML = recentItems.map(item => {
+                        const isResult = item.session !== undefined; // rough check
+                        // Normalized data
+                        const title = isResult
+                            ? `Exam Submission: ${item.session.exam.title}`
+                            : `New Session: ${item.exam_title || 'Unknown Exam'}`;
+                        const user = isResult
+                            ? (item.session.student ? item.session.student.username : 'Student')
+                            : (item.student ? item.student.username : 'Student');
+                        const time = new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        const icon = isResult ? 'bi-file-earmark-check text-success' : 'bi-play-circle text-primary';
+                        const bg = isResult ? 'bg-success' : 'bg-primary';
+
+                        return `
+                        <div class="activity-item">
+                            <div class="activity-icon ${bg} bg-opacity-10">
+                                <i class="bi ${icon}"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between">
+                                    <span class="fw-bold text-dark small">${title}</span>
+                                    <span class="text-muted" style="font-size: 0.75rem">${time}</span>
+                                </div>
+                                <div class="text-secondary small">User: @${user}</div>
+                            </div>
+                        </div>
+                        `;
+                    }).join('');
+                } else {
+                    activityList.innerHTML = '<div class="text-center py-4 text-muted small">No recent activity found.</div>';
+                }
+
+            } catch (error) {
+                console.error('Dashboard Error:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadDashboard);
+
+        // Sidebar Toggles
+        document.querySelector('.mobile-toggle').addEventListener('click', () => {
+            document.querySelector('.sidebar').style.transform = 'translateX(0)';
+        });
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth < 992 && !e.target.closest('.sidebar') && !e.target.closest('.mobile-toggle')) {
+                document.querySelector('.sidebar').style.transform = 'translateX(-100%)';
+            }
+        });
+    </script>
+</body>
+
+</html>

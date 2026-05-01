@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - IT College, Gharyan University</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+
+<body>
+
+    <div class="container-fluid p-0 login-page-container">
+        <div class="row h-100 g-0">
+            <!-- Left Side: Brand Section -->
+            <div class="col-lg-7 d-none d-lg-block">
+                <div class="brand-section">
+                    <div class="brand-logos">
+                        <img src="/static/images/gharyan_logo_new.jpg" alt="University Logo" class="brand-logo-img">
+                        <img src="/static/images/faculty_logo_final.png" alt="Faculty Logo" class="brand-logo-img">
+                    </div>
+
+                    <h1 class="brand-title">Gharyan University<br>IT College</h1>
+                    <p class="brand-subtitle mt-3">Official Examination Platform for the Faculty of Information
+                        Technology.
+                    </p>
+
+                    <div class="quote-card">
+                        <div class="quote-text">
+                            "Education is the most powerful weapon which you can use to change the world."
+                        </div>
+                        <div class="quote-author text-white-50 small">— Nelson Mandela</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Login Form -->
+            <div class="col-lg-5">
+                <div class="login-form-section">
+                    <div class="login-wrapper">
+                        <div class="login-header mb-5">
+                            <h2 class="fw-bold mb-2 font-heading" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                                IT College Login</h2>
+                            <p class="text-secondary">Enter your university credentials to access.</p>
+                        </div>
+
+                        <div id="alert-container"></div>
+
+                        <form id="loginForm" onsubmit="handleLogin(event)">
+                            <div class="mb-4">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control form-control-lg" id="username"
+                                        name="username" placeholder="Username" required>
+                                    <label for="username" class="text-secondary">Username</label>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="form-floating position-relative">
+                                    <input type="password" class="form-control form-control-lg" id="password"
+                                        name="password" placeholder="Password" required>
+                                    <label for="password" class="text-secondary">Password</label>
+                                    <i class="bi bi-eye position-absolute top-50 end-0 translate-middle-y me-3 text-secondary cursor-pointer"
+                                        style="cursor: pointer;" onclick="togglePassword()"></i>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="rememberMe">
+                                    <label class="form-check-label small text-secondary" for="rememberMe">
+                                        Keep me logged in
+                                    </label>
+                                </div>
+                                <a href="#" class="small text-decoration-none text-secondary">Forgot password?</a>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary-lg w-100 mb-4">Sign In</button>
+
+                            <div class="text-center">
+                                <p class="small text-muted">Don't have an account? <a href="/frontend/register.html"
+                                        class="text-decoration-none fw-bold" style="color: var(--primary-color);">Sign
+                                        up now</a></p>
+                            </div>
+
+                            <!-- Quick Login Helpers -->
+                            <div class="quick-roles">
+                                <button type="button" class="role-badge admin" onclick="quickLogin('admin', 'admin')">
+                                    <i class="bi bi-shield-check"></i> Admin
+                                </button>
+                                <button type="button" class="role-badge instr"
+                                    onclick="quickLogin('instructor1', 'password123')">
+                                    <i class="bi bi-person-workspace"></i> Instr
+                                </button>
+                                <button type="button" class="role-badge stud"
+                                    onclick="quickLogin('student1', 'password123')">
+                                    <i class="bi bi-mortarboard"></i> Stud
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Script -->
+    <script src="/static/js/api.js"></script>
+    <script>
+        function togglePassword() {
+            const pwd = document.getElementById('password');
+            const icon = document.querySelector('.bi-eye, .bi-eye-slash');
+            if (pwd.type === 'password') {
+                pwd.type = 'text';
+                icon.classList.replace('bi-eye', 'bi-eye-slash');
+            } else {
+                pwd.type = 'password';
+                icon.classList.replace('bi-eye-slash', 'bi-eye');
+            }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Signing in...';
+            btn.disabled = true;
+
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await API.auth.login(data.username, data.password);
+                // Redirect based on role
+                const role = response.role || (response.user && response.user.role);
+                if (role === 'student') {
+                    window.location.href = '/frontend/index.html';
+                } else {
+                    window.location.href = '/frontend/admin.html';
+                }
+            } catch (error) {
+                const msg = error.error || error.detail || 'Login failed. Please check your credentials.';
+                document.getElementById('alert-container').innerHTML = `
+                    <div class="alert alert-danger small py-3 d-flex align-items-center mb-4 border-0 shadow-sm" style="background-color: #fee2e2; color: #991b1b;">
+                        <i class="bi bi-exclamation-circle-fill me-2 fs-5"></i> ${msg}
+                    </div>
+                `;
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        function quickLogin(u, p) {
+            document.querySelector('input[name="username"]').value = u;
+            document.querySelector('input[name="password"]').value = p;
+            // Optional: Auto submit
+            // document.querySelector('button[type="submit"]').click();
+        }
+    </script>
+</body>
+
+</html>

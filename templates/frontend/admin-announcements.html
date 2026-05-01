@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Announcements | IT College</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons & Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --font-heading: 'Plus Jakarta Sans', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --sidebar-width: 280px;
+            --sidebar-bg: #0f172a;
+            --accent-primary: #f59e0b;
+            /* Admin Theme */
+            --bg-light: #f8fafc;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-light);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            color: #94a3b8;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-section {
+            padding: 0 0.75rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: white;
+            font-family: var(--font-heading);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-icon {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .nav-item-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            color: #94a3b8;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .nav-item-link:hover,
+        .nav-item-link.active {
+            background: #f59e0b;
+            color: white;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .announcement-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .announcement-card:hover {
+            border-color: #cbd5e1;
+        }
+
+        .badge-target {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+    </style>
+    <style>
+        /* Custom Hover Colors */
+        .nav-link-admin:hover,
+        .nav-link-admin.active {
+            background: rgba(245, 158, 11, 0.15) !important;
+            color: #f59e0b !important;
+        }
+
+        .nav-link-academic:hover,
+        .nav-link-academic.active {
+            background: rgba(56, 189, 248, 0.15) !important;
+            color: #38bdf8 !important;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="sidebar">
+        <div class="brand-section">
+            <div class="brand-icon rounded p-1">
+                <i class="bi bi-mortarboard-fill fs-4 text-white"></i>
+            </div>
+            <span>IT College<br><small class="fw-normal opacity-75" style="font-size: 0.7rem">System
+                    Administration</small></span>
+        </div>
+
+        <div class="nav-section flex-grow-1 overflow-y-auto"
+            style="scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.2) transparent;">
+            <div class="d-flex flex-column gap-1">
+                <small class="text-uppercase fw-bold px-3 mb-2 mt-2 text-muted"
+                    style="font-size: 0.7rem; letter-spacing: 1px;">Administration</small>
+                <a href="/frontend/admin.html" class="nav-item-link nav-link-admin">
+                    <i class="bi bi-grid-1x2-fill"></i> Dashboard
+                </a>
+
+                <!-- Admin Only Section -->
+                <div class="admin-only">
+                    <a href="/frontend/admin-users.html" class="nav-item-link nav-link-admin">
+                        <i class="bi bi-people-fill"></i> Users
+                    </a>
+                    <a href="/frontend/admin-announcements.html" class="nav-item-link active nav-link-admin">
+                        <i class="bi bi-megaphone-fill"></i> Announcements
+                    </a>
+                    <a href="/frontend/admin-logs.html" class="nav-item-link nav-link-admin">
+                        <i class="bi bi-shield-lock-fill"></i> Logs
+                    </a>
+                    <a href="/frontend/admin-settings.html" class="nav-item-link nav-link-admin">
+                        <i class="bi bi-gear-fill"></i> Settings
+                    </a>
+                </div>
+
+                <small class="text-uppercase fw-bold px-3 mb-2 mt-3 text-info"
+                    style="font-size: 0.7rem; letter-spacing: 1px;">Academic</small>
+                <a href="/frontend/admin-exams.html" class="nav-item-link nav-link-academic">
+                    <i class="bi bi-file-earmark-text text-info"></i> Exams
+                </a>
+                <a href="/frontend/admin-questions.html" class="nav-item-link nav-link-academic">
+                    <i class="bi bi-hdd-stack-fill text-info"></i> Question Bank
+                </a>
+                <a href="/frontend/admin-analytics.html" class="nav-item-link nav-link-academic">
+                    <i class="bi bi-bar-chart-fill text-info"></i> Analytics
+                </a>
+                <a href="/frontend/grading.html" class="nav-item-link nav-link-academic">
+                    <i class="bi bi-check-circle text-info"></i> Grading
+                </a>
+                <a href="/frontend/admin-monitor.html" class="nav-item-link nav-link-academic"
+                    style="color: #ef4444 !important;">
+                    <i class="bi bi-camera-video-fill" style="color: #ef4444 !important;"></i> Live Command
+                </a>
+            </div>
+        </div>
+
+        <div class="mt-auto pt-3 border-top border-secondary border-opacity-25">
+            <a href="#" onclick="window.utils ? window.utils.logout() : window.location.href='/frontend/login.html'"
+                class="nav-item-link text-danger">
+                <i class="bi bi-box-arrow-left"></i> Sign Out
+            </a>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 fw-bold text-dark font-heading mb-0">System Announcements</h1>
+                <p class="text-muted mb-0">Broadcast messages to users</p>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-primary fw-bold px-4 rounded-pill" onclick="newAnnouncement()">
+                    <i class="bi bi-plus-lg me-2"></i> Create New
+                </button>
+                <div class="dropdown">
+                    <a href="#" class="text-decoration-none d-flex align-items-center gap-2" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        <div class="user-profile">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
+                                style="width: 32px; height: 32px; overflow: hidden;">
+                                <img id="header-avatar" src="" class="w-100 h-100 d-none" style="object-fit:cover;">
+                                <i class="bi bi-person-fill" id="header-icon"></i>
+                            </div>
+                            <div>
+                                <span class="d-block fw-bold text-dark small" id="user-name">User</span>
+                            </div>
+                        </div>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2">
+                        <li><a class="dropdown-item py-2" href="/frontend/profile.html"><i
+                                    class="bi bi-person me-2"></i>My Profile</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item py-2 text-danger" href="#"
+                                onclick="window.utils ? window.utils.logout() : window.location.href='/frontend/login.html'"><i
+                                    class="bi bi-box-arrow-right me-2"></i>Sign Out</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8" id="announcement-list">
+                <!-- Template Item -->
+                <div class="announcement-card">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span
+                            class="badge bg-danger bg-opacity-10 text-danger badge-target rounded-pill px-3 py-2">Global
+                            Alert</span>
+                        <div class="dropdown">
+                            <button class="btn btn-link link-secondary p-0" data-bs-toggle="dropdown"><i
+                                    class="bi bi-three-dots-vertical"></i></button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#">Edit</a></li>
+                                <li><a class="dropdown-item text-danger" href="#">Delete</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <h5 class="fw-bold mb-2">Scheduled Maintenance</h5>
+                    <p class="text-secondary mb-3">The system will be undergoing maintenance this Friday at 10 PM.
+                        Please save your work.</p>
+                    <div class="d-flex align-items-center gap-3 small text-muted">
+                        <span><i class="bi bi-calendar3 me-1"></i> Posted: Dec 20, 2024</span>
+                        <span><i class="bi bi-eye me-1"></i> 1,240 Views</span>
+                    </div>
+                </div>
+
+                <div class="announcement-card">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span
+                            class="badge bg-info bg-opacity-10 text-info badge-target rounded-pill px-3 py-2">Instructors
+                            Only</span>
+                        <div class="dropdown">
+                            <button class="btn btn-link link-secondary p-0" data-bs-toggle="dropdown"><i
+                                    class="bi bi-three-dots-vertical"></i></button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#">Edit</a></li>
+                                <li><a class="dropdown-item text-danger" href="#">Delete</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <h5 class="fw-bold mb-2">Grading Policy Update</h5>
+                    <p class="text-secondary mb-3">Please review the updated grading guidelines for final exams before
+                        submitting grades.</p>
+                    <div class="d-flex align-items-center gap-3 small text-muted">
+                        <span><i class="bi bi-calendar3 me-1"></i> Posted: Dec 18, 2024</span>
+                        <span><i class="bi bi-eye me-1"></i> 45 Views</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="bg-white p-4 rounded-4 border">
+                    <h6 class="fw-bold mb-3">Tips</h6>
+                    <ul class="text-muted small ps-3 mb-0">
+                        <li class="mb-2"><strong>Global Alerts</strong> appear on everyone's dashboard. Use them
+                            sparingly.</li>
+                        <li class="mb-2"><strong>Instructor Updates</strong> are only visible to staff.</li>
+                        <li>Announcements are ordered by date (newest first).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Create Modal -->
+    <div class="modal fade" id="createModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">New Announcement</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">Title</label>
+                            <input type="text" class="form-control" placeholder="e.g. System Update">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">Audience</label>
+                            <select class="form-select">
+                                <option value="all">Everyone (Global)</option>
+                                <option value="student">Students Only</option>
+                                <option value="instructor">Instructors Only</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">Message</label>
+                            <textarea class="form-control" rows="4" placeholder="Type your message..."></textarea>
+                        </div>
+                        <button type="button" class="btn btn-primary w-100 fw-bold rounded-pill"
+                            onclick="alert('Announcement Published!'); bootstrap.Modal.getInstance(document.getElementById('createModal')).hide()">Publish
+                            Now</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function newAnnouncement() {
+            new bootstrap.Modal(document.getElementById('createModal')).show();
+        }
+    </script>
+</body>
+
+</html>

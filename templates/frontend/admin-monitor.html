@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Command Center - Live Proctoring</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #09090b;
+            /* Zinc 950 */
+            --bg-panel: rgba(24, 24, 27, 0.7);
+            /* Zinc 900 + Opacity */
+            --border-color: rgba(255, 255, 255, 0.1);
+            --accent-primary: #3b82f6;
+            --accent-success: #10b981;
+            --accent-danger: #ef4444;
+            --accent-warning: #f59e0b;
+            --text-main: #ffffff;
+            --text-muted: #a1a1aa;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.15) 0px, transparent 50%);
+            color: var(--text-main);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .glass-panel {
+            backdrop-filter: blur(12px);
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Tech/Cyber Aesthetic */
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Header */
+        .monitor-header {
+            height: 70px;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 50;
+            backdrop-filter: blur(12px);
+            background: rgba(9, 9, 11, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .brand-text {
+            font-weight: 800;
+            font-size: 1.25rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(165, 180, 252, 0.3);
+        }
+
+        /* Layout */
+        .layout-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 320px;
+            background: rgba(9, 9, 11, 0.6);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .exam-item {
+            padding: 1.25rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+            margin: 0.5rem;
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .exam-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(4px);
+        }
+
+        .exam-item.active {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Main Grid */
+        .main-view {
+            flex: 1;
+            padding: 2.5rem;
+            overflow-y: auto;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Student Card */
+        .student-card {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 1rem;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .student-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: rgba(59, 130, 246, 0.4);
+            box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.4), 0 0 20px rgba(59, 130, 246, 0.1);
+            z-index: 10;
+        }
+
+        .card-preview {
+            height: 180px;
+            position: relative;
+            background: #000;
+            overflow: hidden;
+        }
+
+        .card-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: opacity 0.3s;
+        }
+
+        .pulse-ring {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 12px;
+            height: 12px;
+            background: var(--accent-success);
+            border-radius: 50%;
+            box-shadow: 0 0 0 rgba(16, 185, 129, 0.7);
+            animation: pulse 2s infinite;
+        }
+
+        .pulse-ring.offline {
+            background: var(--accent-danger);
+            animation: none;
+            box-shadow: none;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
+        }
+
+        .trust-meter {
+            height: 4px;
+            background: #334155;
+            width: 100%;
+        }
+
+        .trust-value {
+            height: 100%;
+            background: var(--accent-success);
+            width: 100%;
+            transition: width 0.5s;
+        }
+
+        .trust-value.warning {
+            background: var(--accent-warning);
+        }
+
+        .trust-value.danger {
+            background: var(--accent-danger);
+        }
+
+        /* Command Modal */
+        .modal-content {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+        }
+
+        .video-feed {
+            background: #000;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            width: 100%;
+            height: 450px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .console-log {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            height: 200px;
+            overflow-y: auto;
+            background: #0f172a;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            color: #3b82f6;
+        }
+
+        .log-entry {
+            margin-bottom: 0.25rem;
+        }
+
+        .log-entry.error {
+            color: #ef4444;
+        }
+
+        .log-entry.success {
+            color: #10b981;
+        }
+
+        /* Utilities */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        .btn-command {
+            background: rgba(59, 130, 246, 0.1);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            transition: all 0.2s;
+        }
+
+        .btn-command:hover {
+            background: rgba(59, 130, 246, 0.2);
+            color: #93c5fd;
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Top Bar -->
+    <header class="monitor-header">
+        <div class="d-flex align-items-center gap-3">
+            <a href="/frontend/admin.html" class="text-muted hover:text-white transition-colors">
+                <i class="bi bi-arrow-left fs-5"></i>
+            </a>
+            <div>
+                <div class="brand-text d-flex align-items-center gap-2">
+                    <i class="bi bi-shield-lock-fill"></i> COMMAND CENTER
+                </div>
+
+            </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-3">
+            <div id="system-status"
+                class="d-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-dark border border-secondary">
+                <span class="status-dot rounded-circle bg-success" style="width: 8px; height: 8px;"></span>
+                <span class="font-mono small text-success">SYSTEM ONLINE</span>
+            </div>
+            <button class="btn btn-outline-secondary btn-sm" onclick="toggleRefresh()">
+                <i class="bi bi-activity"></i> Live Update
+            </button>
+        </div>
+    </header>
+
+    <div class="layout-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="p-3 border-bottom border-dark">
+                <h6 class="text-uppercase text-muted font-mono small mb-3">Active Operations</h6>
+                <button class="btn btn-command w-100 btn-sm" onclick="loadExams()">
+                    <i class="bi bi-arrow-clockwise me-1"></i> SCAN FOR EXAMS
+                </button>
+            </div>
+
+            <div id="exam-list" class="flex-grow-1 overflow-auto">
+                <!-- Exam List Items -->
+                <div class="p-4 text-center text-muted small font-mono">
+                    <div class="spinner-border spinner-border-sm mb-2 text-secondary"></div>
+                    <div>INITIALIZING SCANNERS...</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main View -->
+        <main class="main-view">
+            <div id="dashboard-content">
+                <div class="h-100 d-flex flex-column align-items-center justify-content-center text-muted opacity-50">
+                    <i class="bi bi-grid-3x3-gap-fill display-1 mb-4"></i>
+                    <h4 class="fw-light">Awaiting Selection</h4>
+                    <p class="font-mono small">SELECT AN EXAM TO INITIALIZE SURVEILLANCE GRID</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Surveillance Modal -->
+    <div class="modal fade" id="studentModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-bottom border-dark py-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-eye text-primary"></i>
+                        <h6 class="modal-title font-mono mb-0" id="modalStudentName">UNKNOWN TARGET</h6>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="row g-0">
+                        <!-- Video Feed Area -->
+                        <div class="col-lg-8 p-3 border-end border-dark">
+                            <div class="video-feed mb-3">
+                                <!-- Live Video -->
+                                <video id="liveVideo" autoplay playsinline controls class="w-100 h-100"
+                                    style="display: none; object-fit: contain;"></video>
+
+                                <!-- Static Image Fallback -->
+                                <img id="staticImage" src="" class="w-100 h-100" style="object-fit: contain;">
+
+                                <!-- Overlays -->
+                                <div id="connectingOverlay"
+                                    class="position-absolute d-none flex-column align-items-center text-primary">
+                                    <div class="spinner-grow mb-2"></div>
+                                    <div class="font-mono small">ESTABLISHING SECURE LINK...</div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="font-mono small text-muted">SIGNAL: <span id="signalStrength"
+                                        class="text-success">STRONG</span></div>
+                                <button id="connectBtn" class="btn btn-primary btn-sm px-4"
+                                    onclick="initiateLiveStream()">
+                                    <i class="bi bi-broadcast me-2"></i> ACTIVATE LIVE FEED
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Console/Stats Area -->
+                        <div class="col-lg-4 p-3 bg-dark">
+                            <h6 class="text-muted font-mono small mb-3">TRUST METRICS</h6>
+
+                            <div class="bg-panel rounded p-3 border border-dark mb-4">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="small">Integrity Score</span>
+                                    <span class="small font-mono fw-bold" id="modalTrustScore">100%</span>
+                                </div>
+                                <div class="progress" style="height: 6px; background: #334155;">
+                                    <div class="progress-bar bg-success" id="modalTrustBar" style="width: 100%"></div>
+                                </div>
+                            </div>
+
+                            <h6 class="text-muted font-mono small mb-3">EVENT LOG</h6>
+                            <div id="consoleLog" class="console-log mb-3">
+                                <div class="log-entry">> Initializing monitor...</div>
+                                <div class="log-entry">> Waiting for connection...</div>
+                            </div>
+
+                            <button class="btn btn-outline-danger w-100 btn-sm font-mono"
+                                onclick="alert('Feature coming soon: Force Terminate')">
+                                <i class="bi bi-x-square me-2"></i> TERMINATE SESSION
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/app.js"></script>
+    <script>
+        // --- State Management ---
+        let state = {
+            examId: null,
+            paused: false,
+            students: new Map(), // SessionID -> Data
+            peer: null,
+            activeCall: null,
+            refreshTimer: null,
+            currentSessionId: null
+        };
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!utils.requireAuth()) return;
+            initPeer();
+            await loadExams();
+
+            // Modal Cleanup
+            document.getElementById('studentModal').addEventListener('hidden.bs.modal', stopLiveStream);
+        });
+
+        function initPeer() { // Stabilized Peer Init
+            state.peer = new Peer(null, { debug: 1 });
+            state.peer.on('error', err => logConsole(`PEER ERROR: ${err.type}`, 'error'));
+            state.peer.on('open', id => console.log('Admin Peer Online:', id));
+        }
+
+        function logConsole(msg, type = 'info') {
+            const log = document.getElementById('consoleLog');
+            const time = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const div = document.createElement('div');
+            div.className = `log-entry ${type}`;
+            div.innerText = `> [${time}] ${msg}`;
+            log.appendChild(div);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // --- Exam Management ---
+        async function loadExams() {
+            const container = document.getElementById('exam-list');
+            try {
+                const response = await API.exams.list();
+                const examList = response.results || response;
+                const exams = examList.filter(e => e.is_active);
+
+                if (exams.length === 0) {
+                    container.innerHTML = '<div class="p-4 text-center text-muted font-mono small">NO ACTIVE SIGNALS DETECTED</div>';
+                    return;
+                }
+
+                container.innerHTML = exams.map(e => `
+                    <div class="exam-item ${state.examId === e.id ? 'active' : ''}" onclick="selectExam(${e.id}, this)">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="fw-bold">${e.title}</span>
+                            <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-25" style="font-size: 0.6rem">LIVE</span>
+                        </div>
+                        <div class="text-muted font-mono small d-flex justify-content-between">
+                            <span>ID: ${e.id}</span>
+                            <span>${e.duration_minutes} MIN</span>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                container.innerHTML = '<div class="text-danger p-3 font-mono small">SCAN ERROR: CONNECTION FAILED</div>';
+            }
+        }
+
+        function selectExam(id, el) {
+            document.querySelectorAll('.exam-item').forEach(i => i.classList.remove('active'));
+            if (el) el.classList.add('active');
+
+            state.examId = id;
+
+            // Build Grid
+            document.getElementById('dashboard-content').innerHTML = `
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="fw-bold font-mono mb-0 text-white"><i class="bi bi-grid-fill text-primary me-2"></i>SURVEILLANCE GRID</h5>
+                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 font-mono">LIVE FEED ACTIVE</span>
+                </div>
+                <div class="grid-container" id="grid">
+                    <div class="col-12 py-5 text-center text-muted font-mono">
+                        <div class="spinner-border spinner-border-sm text-primary mb-3"></div>
+                        <div>ESTABLISHING LINK...</div>
+                    </div>
+                </div>
+            `;
+
+            startMonitoring();
+        }
+
+        // --- Monitoring Loop ---
+        function startMonitoring() {
+            if (state.refreshTimer) clearInterval(state.refreshTimer);
+            fetchData();
+            state.refreshTimer = setInterval(() => {
+                if (!state.paused) fetchData();
+            }, 5000); // Faster updates for "Pro" feel
+        }
+
+        async function fetchData() {
+            if (!state.examId) return;
+            try {
+                const data = await API.request(`/examinations/exams/${state.examId}/live-feed/`);
+                updateGrid(data.results || data);
+            } catch (err) {
+                console.error("Fetch error", err);
+            }
+        }
+
+        function updateGrid(snapshots) {
+            const grid = document.getElementById('grid');
+            const now = new Date();
+            let hasData = false;
+
+            snapshots.forEach(s => {
+                hasData = true;
+                const sid = s.session;
+                state.students.set(sid, s);
+
+                // Diff check to prevent full redraw if not needed? 
+                // For simplicity, we just update the DOM elements if they exist, or create new ones.
+
+                let card = document.getElementById(`card-${sid}`);
+                if (!card) {
+                    // Create Card
+                    card = document.createElement('div');
+                    card.id = `card-${sid}`;
+                    card.className = 'student-card fading-in';
+                    card.onclick = () => openConsole(sid);
+                    grid.appendChild(card);
+                }
+
+                // Update Content
+                const lastSeen = new Date(s.timestamp);
+                const secondsAgo = (now - lastSeen) / 1000;
+                const isOnline = secondsAgo < 60; // 60s threshold for "Active"
+                const trustColor = s.trust_score > 0.8 ? 'bg-success' : (s.trust_score > 0.5 ? 'bg-warning' : 'bg-danger');
+
+                // Visual Tracking Overlay
+                let overlay = '';
+                if (s.face_data) {
+                    const box = s.face_data;
+                    const borderColor = s.trust_score < 0.6 ? 'rgba(239, 68, 68, 0.8)' : 'rgba(255, 255, 255, 0.8)';
+                    const shadowColor = s.trust_score < 0.6 ? 'rgba(239, 68, 68, 0.5)' : 'rgba(255, 255, 255, 0.5)';
+
+                    overlay = `
+                    <div style="
+                        position: absolute;
+                        left: ${box.x * 100}%;
+                        top: ${box.y * 100}%;
+                        width: ${box.width * 100}%;
+                        height: ${box.height * 100}%;
+                        border: 2px solid ${borderColor};
+                        border-radius: 50%;
+                        box-shadow: 0 0 15px ${shadowColor};
+                        transition: all 0.1s;
+                        pointer-events: none;
+                    "></div>`;
+                }
+
+                // Issue Badge
+                const issueBadge = s.issue_type ?
+                    `<span class="badge bg-danger position-absolute top-0 end-0 m-2 font-mono" style="font-size: 0.6rem; z-index: 10;">${s.issue_type.replace('_', ' ')}</span>` : '';
+
+                card.innerHTML = `
+                    <div class="card-preview position-relative">
+                        <img src="${s.image}" onerror="this.src='https://via.placeholder.com/300x200?text=NO+SIGNAL'">
+                        ${overlay}
+                        ${issueBadge}
+                        <div class="pulse-ring ${isOnline ? '' : 'offline'}"></div>
+                        <div class="position-absolute bottom-0 start-0 w-100 p-2 bg-black bg-opacity-75 backdrop-blur">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="font-mono text-white small fw-bold text-truncate">${s.student_name || 'STUDENT ' + sid}</span>
+                                <span class="badge ${isOnline ? 'bg-success' : 'bg-danger'} bg-opacity-75" style="font-size:0.6rem">${isOnline ? 'ONLINE' : 'LOST'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-2 border-top border-dark bg-panel">
+                        <div class="d-flex justify-content-between align-items-end mb-1">
+                            <span class="text-muted small font-mono" style="font-size: 0.7rem">TRUST SCORE</span>
+                            <span class="font-mono fw-bold ${s.trust_score < 0.8 ? 'text-warning' : 'text-success'}" style="font-size: 0.8rem">${(s.trust_score * 100).toFixed(0)}%</span>
+                        </div>
+                        <div class="trust-meter rounded-pill overflow-hidden">
+                            <div class="trust-value ${s.trust_score < 0.5 ? 'danger' : (s.trust_score < 0.8 ? 'warning' : '')}" style="width: ${s.trust_score * 100}%"></div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            if (!hasData && grid.children.length === 0) {
+                grid.innerHTML = '<div class="col-12 py-5 text-center text-muted font-mono">NO SIGNALS DETECTED. WAITING FOR UPLINK...</div>';
+            }
+        }
+
+        // --- Console Logic (Modal) ---
+        function openConsole(sid) {
+            const data = state.students.get(sid);
+            if (!data) return;
+
+            state.currentSessionId = sid;
+
+            // Populate Modal
+            document.getElementById('modalStudentName').innerText = (data.student_name || `TARGET ${sid}`).toUpperCase();
+            document.getElementById('modalTrustScore').innerText = `${(data.trust_score * 100).toFixed(0)}%`;
+            document.getElementById('modalTrustBar').style.width = `${data.trust_score * 100}%`;
+
+            document.getElementById('staticImage').src = data.image;
+            document.getElementById('liveVideo').style.display = 'none';
+            document.getElementById('staticImage').style.display = 'block';
+            document.getElementById('connectingOverlay').classList.add('d-none');
+
+            const btn = document.getElementById('connectBtn');
+            btn.innerHTML = '<i class="bi bi-broadcast me-2"></i> ACTIVATE LIVE FEED';
+            btn.disabled = false;
+            btn.className = 'btn btn-primary btn-sm px-4';
+
+            // Clear Log
+            document.getElementById('consoleLog').innerHTML = '';
+            logConsole(`Target locked: ${data.student_name}`);
+            logConsole(`Ready to initiate secure video link...`);
+
+            new bootstrap.Modal(document.getElementById('studentModal')).show();
+        }
+
+        // --- Live Video Logic ---
+        function initiateLiveStream() {
+            const sid = state.currentSessionId;
+            const peerId = `student_${sid}`;
+            const btn = document.getElementById('connectBtn');
+
+            logConsole(`Initiating handshake with ${peerId}...`);
+            btn.disabled = true;
+            document.getElementById('connectingOverlay').classList.remove('d-none');
+
+            // Close existing if any (paranoid check)
+            if (state.activeCall) state.activeCall.close();
+
+            // CALL
+            state.activeCall = state.peer.call(peerId, new MediaStream()); // Dummy stream to trigger 2-way? Or just receive.
+
+            // TIMEOUT HANDLER
+            const timeout = setTimeout(() => {
+                if (btn.disabled) { // Still trying
+                    logConsole(`CONNECTION TIMEOUT. Target unreachable.`, 'error');
+                    logConsole(`Hint: Check if student tab is active/online.`, 'warning');
+                    stopLiveStream();
+                    btn.disabled = false;
+                    document.getElementById('connectingOverlay').classList.add('d-none');
+                }
+            }, 8000);
+
+            state.activeCall.on('stream', stream => {
+                clearTimeout(timeout);
+                logConsole(`Uplink established. Video feed active.`, 'success');
+
+                document.getElementById('staticImage').style.display = 'none';
+                document.getElementById('connectingOverlay').classList.add('d-none');
+
+                const vid = document.getElementById('liveVideo');
+                vid.style.display = 'block';
+                vid.srcObject = stream;
+
+                btn.className = 'btn btn-success btn-sm px-4';
+                btn.innerHTML = '<i class="bi bi-wifi me-2"></i> FEED ONLINE';
+            });
+
+            state.activeCall.on('error', err => {
+                logConsole(`Link Info: ${err}`, 'error');
+            });
+
+            state.activeCall.on('close', () => {
+                logConsole(`Feed disconnected.`, 'warning');
+                stopLiveStream();
+            });
+        }
+
+        function stopLiveStream() {
+            if (state.activeCall) {
+                state.activeCall.close();
+                state.activeCall = null;
+            }
+
+            document.getElementById('liveVideo').srcObject = null;
+            document.getElementById('liveVideo').style.display = 'none';
+            document.getElementById('staticImage').style.display = 'block';
+            document.getElementById('connectingOverlay').classList.add('d-none');
+
+            const btn = document.getElementById('connectBtn');
+            if (btn) {
+                btn.innerHTML = '<i class="bi bi-broadcast me-2"></i> ACTIVATE LIVE FEED';
+                btn.className = 'btn btn-primary btn-sm px-4';
+                btn.disabled = false;
+            }
+        }
+
+        function toggleRefresh() {
+            state.paused = !state.paused;
+            const btn = document.querySelector('button[onclick="toggleRefresh()"]');
+            btn.classList.toggle('btn-outline-secondary');
+            btn.classList.toggle('btn-warning');
+        }
+    </script>
+</body>
+
+</html>

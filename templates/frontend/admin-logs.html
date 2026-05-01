@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audit Logs | IT College</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons & Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --font-heading: 'Plus Jakarta Sans', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --sidebar-width: 280px;
+            --sidebar-bg: #0f172a;
+            --accent-primary: #f59e0b;
+            /* Admin Theme */
+            --bg-light: #f8fafc;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-light);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            color: #94a3b8;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-section {
+            padding: 0 0.75rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: white;
+            font-family: var(--font-heading);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-icon {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .nav-item-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            color: #94a3b8;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .nav-item-link:hover,
+        .nav-item-link.active {
+            background: #f59e0b;
+            color: white;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .log-entry {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            transition: background 0.2s;
+        }
+
+        .log-entry:hover {
+            background-color: #fffbeb;
+        }
+
+        .log-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+        }
+    </style>
+    <style>
+        /* Custom Hover Colors */
+        .nav-link-admin:hover,
+        .nav-link-admin.active {
+            background: rgba(245, 158, 11, 0.15) !important;
+            color: #f59e0b !important;
+        }
+
+        .nav-link-academic:hover,
+        .nav-link-academic.active {
+            background: rgba(56, 189, 248, 0.15) !important;
+            color: #38bdf8 !important;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="sidebar">
+        <div class="brand-section">
+            <div class="brand-icon rounded p-1">
+                <i class="bi bi-mortarboard-fill fs-4 text-white"></i>
+            </div>
+            <span>IT College<br><small class="fw-normal opacity-75" style="font-size: 0.7rem">System
+                    Administration</small></span>
+        </div>
+
+        <div class="nav-section flex-grow-1 overflow-y-auto"
+            style="scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.2) transparent;">
+            <div class="d-flex flex-column gap-1">
+                <small class="text-uppercase fw-bold px-3 mb-2 mt-2 text-muted"
+                    style="font-size: 0.7rem; letter-spacing: 1px;">Administration</small>
+                <a href="/frontend/admin.html" class="nav-item-link nav-link-admin">
+                    <i class="bi bi-grid-1x2-fill"></i> Dashboard
+                </a>
+
+                <!-- Admin Only Section -->
+                <div class="admin-only">
+                    <a href="/frontend/admin-users.html" class="nav-item-link nav-link-admin">
+                        <i class="bi bi-people-fill"></i> Users
+                    </a>
+                    <a href="/frontend/admin-announcements.html" class="nav-item-link nav-link-admin">
+                        <i class="bi bi-megaphone-fill"></i> Announcements
+                    </a>
+                    <a href="/frontend/admin-logs.html" class="nav-item-link active nav-link-admin">
+                        <i class="bi bi-shield-lock-fill"></i> Logs
+                    </a>
+                    <a href="/frontend/admin-settings.html" class="nav-item-link nav-link-admin">
+                        <i class="bi bi-gear-fill"></i> Settings
+                    </a>
+                </div>
+
+                <small class="text-uppercase fw-bold px-3 mb-2 mt-3 text-info"
+                    style="font-size: 0.7rem; letter-spacing: 1px;">Academic</small>
+                <a href="/frontend/admin-exams.html" class="nav-item-link nav-link-academic">
+                    <i class="bi bi-file-earmark-text text-info"></i> Exams
+                </a>
+                <a href="/frontend/admin-questions.html" class="nav-item-link nav-link-academic">
+                    <i class="bi bi-hdd-stack-fill text-info"></i> Question Bank
+                </a>
+                <a href="/frontend/admin-analytics.html" class="nav-item-link nav-link-academic">
+                    <i class="bi bi-bar-chart-fill text-info"></i> Analytics
+                </a>
+                <a href="/frontend/grading.html" class="nav-item-link nav-link-academic">
+                    <i class="bi bi-check-circle text-info"></i> Grading
+                </a>
+                <a href="/frontend/admin-monitor.html" class="nav-item-link nav-link-academic"
+                    style="color: #ef4444 !important;">
+                    <i class="bi bi-camera-video-fill" style="color: #ef4444 !important;"></i> Live Command
+                </a>
+            </div>
+        </div>
+
+        <div class="mt-auto pt-3 border-top border-secondary border-opacity-25">
+            <a href="#" onclick="window.utils ? window.utils.logout() : window.location.href='/frontend/login.html'"
+                class="nav-item-link text-danger">
+                <i class="bi bi-box-arrow-left"></i> Sign Out
+            </a>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 fw-bold text-dark font-heading mb-0">Security Audit Logs</h1>
+                <p class="text-muted mb-0">Track system activities and security events</p>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-outline-secondary btn-sm" onclick="downloadLogs()"><i
+                        class="bi bi-download me-2"></i> Export Logs</button>
+                <div class="dropdown">
+                    <a href="#" class="text-decoration-none d-flex align-items-center gap-2" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        <div class="user-profile">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
+                                style="width: 32px; height: 32px; overflow: hidden;">
+                                <img id="header-avatar" src="" class="w-100 h-100 d-none" style="object-fit:cover;">
+                                <i class="bi bi-person-fill" id="header-icon"></i>
+                            </div>
+                            <div>
+                                <span class="d-block fw-bold text-dark small" id="user-name">User</span>
+                            </div>
+                        </div>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2">
+                        <li><a class="dropdown-item py-2" href="/frontend/profile.html"><i
+                                    class="bi bi-person me-2"></i>My Profile</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item py-2 text-danger" href="#"
+                                onclick="window.utils ? window.utils.logout() : window.location.href='/frontend/login.html'"><i
+                                    class="bi bi-box-arrow-right me-2"></i>Sign Out</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="card-header bg-white p-3 border-bottom">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control bg-light border-start-0"
+                                placeholder="Search user or action...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-0" id="logs-container">
+                <!-- Mock Logs -->
+                <div class="log-entry">
+                    <div class="log-icon bg-success bg-opacity-10 text-success"><i class="bi bi-check-circle-fill"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-bold text-dark">User Login Successful</span>
+                            <span class="small text-muted">2 mins ago</span>
+                        </div>
+                        <div class="small text-secondary">Admin (admin@univ.edu) logged in from 192.168.1.5</div>
+                    </div>
+                </div>
+                <div class="log-entry">
+                    <div class="log-icon bg-primary bg-opacity-10 text-primary"><i class="bi bi-person-plus-fill"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-bold text-dark">User Created</span>
+                            <span class="small text-muted">15 mins ago</span>
+                        </div>
+                        <div class="small text-secondary">Student account "student2024" created by Instructor Doe</div>
+                    </div>
+                </div>
+                <div class="log-entry">
+                    <div class="log-icon bg-warning bg-opacity-10 text-warning"><i class="bi bi-pencil-square"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-bold text-dark">Exam Updated</span>
+                            <span class="small text-muted">1 hour ago</span>
+                        </div>
+                        <div class="small text-secondary">Exam "Network Security Final" modified by Instructor Doe</div>
+                    </div>
+                </div>
+                <div class="log-entry">
+                    <div class="log-icon bg-danger bg-opacity-10 text-danger"><i class="bi bi-shield-slash-fill"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-bold text-dark">Failed Login Attempt</span>
+                            <span class="small text-muted">2 hours ago</span>
+                        </div>
+                        <div class="small text-secondary">Multiple failed attempts for user "unknown" from 10.0.0.1
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-white p-3 text-center border-top">
+                <button class="btn btn-sm btn-link text-decoration-none">Load More Activities</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function downloadLogs() {
+            alert("Exporting logs to CSV...");
+        }
+    </script>
+</body>
+
+</html>

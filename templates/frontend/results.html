@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Results - IT College</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons & Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --font-heading: 'Plus Jakarta Sans', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --sidebar-width: 280px;
+            --sidebar-bg: #0f172a;
+            --accent-primary: #6366f1;
+            --bg-light: #f8fafc;
+            --text-dark: #1e293b;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-light);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            color: #94a3b8;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 1000;
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+
+        .brand-section {
+            padding: 0 0.75rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: white;
+            font-family: var(--font-heading);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-icon {
+            background: linear-gradient(135deg, #a855f7, #7e22ce);
+        }
+
+        .nav-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .nav-item-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            color: #94a3b8;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .nav-item-link:hover,
+        .nav-item-link.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-item-link.active {
+            background: var(--accent-primary);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 2rem;
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title h1 {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1.75rem;
+            color: var(--text-dark);
+            margin: 0;
+        }
+
+        /* Stats Overview */
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-box {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .stat-icon-small {
+            width: 42px;
+            height: 42px;
+            background: #f8fafc;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: #64748b;
+        }
+
+        .stat-details h4 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text-dark);
+        }
+
+        .stat-details span {
+            font-size: 0.75rem;
+            color: #64748b;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        /* Results Table Card */
+        .results-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+
+        .result-item {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: background 0.2s;
+        }
+
+        .result-item:hover {
+            background-color: #f8fafc;
+        }
+
+        .result-icon-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-right: 1.5rem;
+        }
+
+        .pass-icon {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .fail-icon {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .result-info {
+            flex: 1;
+        }
+
+        .result-score {
+            text-align: right;
+        }
+
+        .badge-pass {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-fail {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        @media (max-width: 991px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="brand-section">
+            <div class="brand-icon rounded p-1">
+                <i class="bi bi-mortarboard-fill fs-4 text-white"></i>
+            </div>
+            <span>IT College<br><small class="fw-normal opacity-75" style="font-size: 0.7rem">Student
+                    Portal</small></span>
+        </div>
+
+        <div class="nav-section">
+            <a href="/frontend/index.html" class="nav-item-link">
+                <i class="bi bi-grid-1x2-fill"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/frontend/exams.html" class="nav-item-link">
+                <i class="bi bi-file-earmark-text-fill"></i>
+                <span>My Exams</span>
+            </a>
+            <a href="/frontend/results.html" class="nav-item-link active">
+                <i class="bi bi-trophy-fill"></i>
+                <span>Results</span>
+            </a>
+            <a href="/frontend/profile.html" class="nav-item-link">
+                <i class="bi bi-person-circle"></i>
+                <span>My Profile</span>
+            </a>
+        </div>
+
+        <div class="mt-auto">
+            <a href="#" class="nav-item-link text-danger" onclick="logout()">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Sign Out</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <div class="page-title">
+                <h1>Performance History</h1>
+                <p class="text-secondary mb-0">Track your progress and review past exams</p>
+            </div>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="stats-overview">
+            <div class="stat-box">
+                <div class="stat-icon-small"><i class="bi bi-journal-check"></i></div>
+                <div class="stat-details">
+                    <h4 id="total-attempts">0</h4>
+                    <span>Total Attempts</span>
+                </div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon-small"><i class="bi bi-graph-up-arrow"></i></div>
+                <div class="stat-details">
+                    <h4 id="avg-performance">0%</h4>
+                    <span>Average Score</span>
+                </div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon-small"><i class="bi bi-check-all"></i></div>
+                <div class="stat-details">
+                    <h4 id="pass-rate">0%</h4>
+                    <span>Pass Rate</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results List -->
+        <div class="results-card">
+            <div class="p-3 border-bottom bg-light">
+                <h6 class="m-0 fw-bold text-dark">Exam History</h6>
+            </div>
+
+            <div id="results-container">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="text-muted mt-2">Loading results...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/app.js"></script>
+    <script>
+        async function loadResults() {
+            if (!utils.isAuthenticated()) {
+                window.location.href = '/frontend/login.html';
+                return;
+            }
+
+            try {
+                const results = await API.results.list();
+                const resultsList = results.results || results;
+
+                updateStats(resultsList);
+
+                if (resultsList.length === 0) {
+                    document.getElementById('results-container').innerHTML = `
+                        <div class="text-center py-5">
+                            <i class="bi bi-clipboard-x fs-1 text-secondary mb-3 d-block"></i>
+                            <h5 class="text-dark">No exam history</h5>
+                            <p class="text-secondary small">You haven't completed any exams yet.</p>
+                        </div>`;
+                    return;
+                }
+
+                document.getElementById('results-container').innerHTML = resultsList.map(result => {
+                    const isPass = result.passed;
+                    const date = new Date(result.graded_at || result.created_at).toLocaleDateString('en-US', {
+                        year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                    });
+
+                    return `
+                        <div class="result-item">
+                            <div class="d-flex align-items-center flex-grow-1">
+                                <div class="result-icon-circle ${isPass ? 'pass-icon' : 'fail-icon'}">
+                                    <i class="bi ${isPass ? 'bi-emoji-smile' : 'bi-emoji-frown'}"></i>
+                                </div>
+                                <div class="result-info">
+                                    <h5 class="fw-bold fs-6 mb-1 text-dark">${result.session.exam.title}</h5>
+                                    <p class="text-secondary small mb-0">
+                                        <i class="bi bi-calendar3 me-1"></i> ${date}
+                                        <span class="badge ${isPass ? 'badge-pass' : 'badge-fail'} ms-2 rounded-pill border border-dark-subtle border-opacity-10">${isPass ? 'PASSED' : 'FAILED'}</span>
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="text-end ms-4">
+                                <div class="fs-4 fw-bold ${isPass ? 'text-success' : 'text-danger'}">${result.percentage_score}%</div>
+                                <div class="small text-secondary mb-2">${result.total_points_earned} / ${result.total_points_possible} pts</div>
+                                <a href="/frontend/review.html?id=${result.id}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                    Review
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error('Error loading results:', error);
+                document.getElementById('results-container').innerHTML =
+                    '<div class="alert alert-danger m-3">Failed to load results.</div>';
+            }
+        }
+
+        function updateStats(results) {
+            const total = results.length;
+            if (total === 0) return;
+
+            const passed = results.filter(r => r.passed).length;
+            const avg = results.reduce((acc, curr) => acc + parseFloat(curr.percentage_score), 0) / total;
+
+            document.getElementById('total-attempts').textContent = total;
+            document.getElementById('avg-performance').textContent = Math.round(avg) + '%';
+            document.getElementById('pass-rate').textContent = Math.round((passed / total) * 100) + '%';
+        }
+
+        function logout() {
+            if (window.utils && window.utils.logout) utils.logout();
+        }
+
+        document.addEventListener('DOMContentLoaded', loadResults);
+    </script>
+</body>
+
+</html>

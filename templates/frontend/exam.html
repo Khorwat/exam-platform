@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Session - Online Examination Platform</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <!-- Bootstrap & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --font-heading: 'Plus Jakarta Sans', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --bg-light: #f3f4f6;
+            --text-dark: #1f2937;
+            --sidebar-width: 320px;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-light);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            user-select: none;
+            /* Prevent copying */
+        }
+
+        /* Fullscreen Blocker */
+        #fullscreen-blocker {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            z-index: 9999;
+            display: none;
+            /* Hidden by default */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Top Header */
+        .exam-header {
+            background: white;
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            border-bottom: 1px solid #e5e7eb;
+            flex-shrink: 0;
+            z-index: 50;
+        }
+
+        .exam-branding {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+        }
+
+        .exam-info h5 {
+            margin: 0;
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-dark);
+        }
+
+        /* Status Indicators */
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 50px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-online {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-offline {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .app-layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: white;
+            border-left: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            z-index: 40;
+        }
+
+        .camera-container {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            background: #f9fafb;
+        }
+
+        .camera-box {
+            width: 100%;
+            aspect-ratio: 4/3;
+            background: #000;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        #webcam-feed {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+
+        .rec-dot {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 12px;
+            height: 12px;
+            background: #ef4444;
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        .question-map {
+            padding: 1.5rem;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .map-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
+        }
+
+        .map-btn {
+            aspect-ratio: 1;
+            border: 1px solid #e5e7eb;
+            background: white;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            color: #6b7280;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .map-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .map-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        .map-btn.answered {
+            background: #f0fdf4;
+            color: #15803d;
+            border-color: #bbf7d0;
+        }
+
+        .map-btn.flagged::after {
+            content: '';
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 6px;
+            height: 6px;
+            background: #f59e0b;
+            border-radius: 50%;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 3rem;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .question-card {
+            max-width: 850px;
+            margin: 0 auto;
+            background: white;
+            padding: 3rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e5e7eb;
+        }
+
+        .q-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .q-text {
+            font-family: var(--font-heading);
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        /* Options Styling */
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .option-item {
+            position: relative;
+        }
+
+        .option-input {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .option-card {
+            display: flex;
+            align-items: center;
+            padding: 1.25rem 1.5rem;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 1rem;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .option-card:hover {
+            border-color: #9ca3af;
+            background: #f9fafb;
+        }
+
+        .option-input:checked+.option-card {
+            border-color: var(--primary);
+            background: #eef2ff;
+            box-shadow: 0 0 0 2px var(--primary-dark);
+        }
+
+        .option-key {
+            width: 32px;
+            height: 32px;
+            border: 2px solid #d1d5db;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #6b7280;
+            margin-right: 1rem;
+            transition: all 0.2s;
+        }
+
+        .option-input:checked+.option-card .option-key {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Bottom Bar */
+        .bottom-bar {
+            background: white;
+            padding: 1.5rem 3rem;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes blink-red {
+
+            0%,
+            100% {
+                background-color: transparent;
+            }
+
+            50% {
+                background-color: rgba(220, 38, 38, 0.1);
+            }
+        }
+
+        .timer-warning {
+            animation: blink-red 1s infinite;
+            border-color: #dc2626;
+            color: #dc2626;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Fullscreen Enforcement Overlay -->
+    <div id="fullscreen-blocker">
+        <i class="bi bi-arrows-fullscreen display-1 mb-4"></i>
+        <h2 class="mb-3">Fullscreen Required</h2>
+        <p class="mb-4 text-white-50">You must enable fullscreen mode to continue this exam.</p>
+        <button class="btn btn-primary btn-lg rounded-pill px-5" onclick="enableFullscreen()">
+            Enter Fullscreen
+        </button>
+    </div>
+
+    <!-- Error/Alert Modal -->
+    <div class="modal fade" id="alertModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg pb-4">
+                <div class="modal-body text-center pt-5">
+                    <div class="mb-4 text-danger fs-1">
+                        <i class="bi bi-exclamation-circle-fill"></i>
+                    </div>
+                    <h4 class="fw-bold mb-2">Notice</h4>
+                    <p class="text-secondary px-4" id="alertMessage">An error occurred.</p>
+                </div>
+                <div class="text-center">
+                    <button type="button" class="btn btn-secondary px-5 fw-medium rounded-pill"
+                        onclick="window.location.href='/frontend/exams.html'">
+                        Return to Dashboard
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="exam-header">
+        <div class="exam-branding">
+            <div class="brand-icon"><i class="bi bi-mortarboard-fill"></i></div>
+            <div class="exam-info">
+                <h5 id="exam-title-display">Loading Exam...</h5>
+                <div class="d-flex gap-3 text-muted small">
+                    <span><i class="bi bi-person-badge"></i> Student: <span id="student-name">...</span></span>
+                    <span id="instructor-info" class="d-none border-start ps-3"><i class="bi bi-person-video3"></i>
+                        Instructor: <span id="instructor-name">...</span></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-4">
+            <div class="status-badge status-online" id="connection-status">
+                <i class="bi bi-wifi"></i> <span>Online</span>
+            </div>
+
+            <div class="status-badge bg-light border text-dark fs-5 py-2 px-3" id="timer-badge">
+                <i class="bi bi-stopwatch me-2 text-primary"></i>
+                <span id="timer-display" class="font-monospace">00:00:00</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="app-layout">
+        <!-- Main Content -->
+        <main class="main-content">
+            <div id="loader" class="text-center py-5">
+                <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status"></div>
+                <h5 class="mt-3 text-muted fw-normal">Preparing secure environment...</h5>
+            </div>
+
+            <div id="question-area" class="d-none">
+                <div class="question-card">
+                    <div class="q-meta">
+                        <div>
+                            <span class="text-uppercase text-muted fw-bold small tracking-wider">Question <span
+                                    id="q-index">1</span></span>
+                            <span class="mx-2 text-muted">•</span>
+                            <span class="badge bg-indigo-50 text-indigo-700 border border-indigo-100 rounded-pill px-3"
+                                id="q-points">1 Point</span>
+                        </div>
+                        <button class="btn btn-light btn-sm text-secondary" onclick="toggleFlag()">
+                            <i class="bi bi-flag me-1"></i> <span id="flag-text">Flag for Review</span>
+                        </button>
+                    </div>
+
+                    <div class="q-text" id="q-text-content">
+                        <!-- Question Text -->
+                    </div>
+
+                    <div class="options-list" id="options-container">
+                        <!-- Options injected here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="camera-container">
+                <h6 class="text-uppercase text-muted small fw-bold mb-3">Live Proctoring</h6>
+                <div class="camera-box">
+                    <video id="webcam-feed" autoplay playsinline muted></video>
+                    <div class="rec-dot" title="Recording"></div>
+                </div>
+                <div class="mt-2 text-center">
+                    <small class="text-muted" id="trust-score-display"><i
+                            class="bi bi-shield-check text-success me-1"></i> Trust Score: 100%</small>
+                </div>
+            </div>
+
+            <div class="question-map">
+                <h6 class="text-uppercase text-muted small fw-bold mb-3 d-flex justify-content-between">
+                    Question Navigator
+                    <span class="badge bg-light text-dark border" id="progress-text">0/0</span>
+                </h6>
+                <div class="map-grid" id="question-grid">
+                    <!-- Grid Buttons -->
+                </div>
+            </div>
+
+            <div class="p-4 border-top bg-white">
+                <button class="btn btn-outline-danger w-100 py-2 fw-bold" onclick="finishExam()">
+                    Finish & Submit Exam
+                </button>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <footer class="bottom-bar">
+        <button class="btn btn-light border px-4 py-2 fw-medium" id="btn-prev" onclick="navQuestion(-1)">
+            <i class="bi bi-arrow-left me-2"></i> Previous
+        </button>
+
+        <div class="d-flex gap-2">
+            <!-- Optional tools -->
+            <small class="text-muted d-none d-lg-block my-auto">
+                <i class="bi bi-info-circle me-1"></i> Responses saved automatically
+            </small>
+        </div>
+
+        <button class="btn btn-primary px-5 py-2 fw-bold shadow-sm" id="btn-next" onclick="navQuestion(1)">
+            Next Question <i class="bi bi-arrow-right ms-2"></i>
+        </button>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/app.js"></script>
+
+    <script>
+        // State
+        let session = null;
+        let questions = [];
+        let currentIndex = 0;
+        let answers = {}; // Map questionId -> optionId
+        let flags = new Set();
+        let timerInterval;
+
+        // Init
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!utils.isAuthenticated()) return window.location.href = '/frontend/login.html';
+
+            // Fullscreen check
+            document.getElementById('fullscreen-blocker').style.display = 'flex';
+
+            // Start loading
+            const params = new URLSearchParams(window.location.search);
+            const examId = params.get('exam_id');
+            if (!examId) { alert('No exam ID'); return window.location.href = '/frontend/exams.html'; }
+
+            try {
+                // Initialize Webcam
+                initWebcam();
+
+                // Start Session
+                const data = await API.examinations.startExam(examId);
+                session = data;
+                questions = data.questions || [];
+
+                // Pre-fill answers from server if resuming
+                // We'll need to fetch existing answers if session was already active.
+                // The API startExam returns existing session if active.
+                // But does it return answers?
+                // `start_exam` view returns `ExamSessionSerializer` which includes `answers`.
+                if (session.answers && session.answers.length > 0) {
+                    session.answers.forEach(ans => {
+                        if (ans.selected_option_id) answers[ans.question] = ans.selected_option_id; // Mapping question ID to Option ID
+                        // NOTE: API might return answers list with `question` ID reference
+                        // let's check serializer. ExamAnswerSerializer has `question` object or ID?
+                        // It returns `question` object (full). So `ans.question.id`
+                        if (ans.question && ans.question.id) answers[ans.question.id] = ans.selected_option_id;
+                    });
+                }
+
+                // Render UI
+                document.getElementById('exam-title-display').textContent = session.exam.title;
+                document.getElementById('student-name').textContent = JSON.parse(localStorage.getItem('user')).username;
+
+                if (session.exam.created_by_name) {
+                    document.getElementById('instructor-name').textContent = session.exam.created_by_name;
+                    document.getElementById('instructor-info').classList.remove('d-none');
+                }
+
+                renderGrid();
+                loadQuestion(0);
+                startTimer(session.time_remaining_seconds);
+
+                document.getElementById('loader').classList.add('d-none');
+
+                // Fullscreen check listener
+                document.addEventListener('fullscreenchange', () => {
+                    const blocker = document.getElementById('fullscreen-blocker');
+                    if (!document.fullscreenElement) {
+                        blocker.style.display = 'flex';
+                    } else {
+                        blocker.style.display = 'none';
+                        document.getElementById('question-area').classList.remove('d-none');
+                    }
+                });
+
+            } catch (e) {
+                console.error(e);
+                let msg = e.message || "Unknown error occurred.";
+
+                // Friendly override for specific known errors
+                if (msg.toLowerCase().includes("already taken") || msg.toLowerCase().includes("previous session expired")) {
+                    msg = "You have already completed this assessment. Please check your results.";
+                } else if (msg.includes("Time limit")) {
+                    msg = "The time limit for this exam has expired.";
+                }
+
+                document.getElementById('alertMessage').textContent = msg;
+                const modal = new bootstrap.Modal(document.getElementById('alertModal'));
+                modal.show();
+            }
+        });
+
+        // Fullscreen Logic
+        function enableFullscreen() {
+            document.documentElement.requestFullscreen().catch(e => {
+                alert('Fullscreen is required. Please enable it.');
+            });
+        }
+
+        // Proctoring State
+        let proctor = {
+            peer: null,
+            stream: null,
+            trustScore: 1.0,
+            warnings: [],
+            lastSnapshot: 0,
+            isTabActive: true
+        };
+
+        // Webcam & PeerJS
+        async function initWebcam() {
+            try {
+                // Get Stream
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 240 } });
+                document.getElementById('webcam-feed').srcObject = stream;
+                proctor.stream = stream;
+
+                // Init PeerJS
+                if (session && session.id) initPeer(session.id);
+
+                // Start Analysis Loop
+                setInterval(analyzeFrame, 2000); // Check every 2s
+
+            } catch (e) {
+                console.warn("Webcam failed", e);
+                alert("Camera access is required for proctoring. Please allow camera access.");
+            }
+        }
+
+        function initPeer(sessionId) {
+            const peerId = `student_${sessionId}`;
+            proctor.peer = new Peer(peerId, { debug: 1 });
+
+            proctor.peer.on('open', (id) => {
+                console.log('My Peer ID is: ' + id);
+            });
+
+            // Answer calls automatically
+            proctor.peer.on('call', (call) => {
+                console.log('Incoming monitoring request...');
+                call.answer(proctor.stream);
+            });
+
+            proctor.peer.on('error', (err) => {
+                console.warn("PeerJS Error:", err);
+                if (err.type === 'unavailable-id') {
+                    // ID taken? Maybe refresh or just ignore if already connected
+                }
+            });
+        }
+
+        // --- Proctoring Logic ---
+
+        // 1. Focus Tracking
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) {
+                // User left tab
+                proctor.isTabActive = false;
+                reduceTrust(0.1, "FOCUS_LOST");
+                captureSnapshot("FOCUS_LOST");
+                console.log("Proctor: Focus lost!");
+            } else {
+                proctor.isTabActive = true;
+            }
+        });
+
+        // 2. Simple Frame Analysis (Movement)
+        let lastFrameBuffer = null;
+
+        function analyzeFrame() {
+            if (!proctor.stream) return;
+
+            // We can add simple motion detection here if needed using a hidden Canvas
+            // For now, we'll just periodically save a snapshot if trust is low or randomly
+
+            // Random snapshot check (1% chance per tick -> roughly every 3-4 mins)
+            if (Math.random() < 0.01) {
+                captureSnapshot("ROUTINE_CHECK");
+            }
+        }
+
+        function reduceTrust(amount, reason) {
+            proctor.trustScore = Math.max(0, proctor.trustScore - amount);
+            updateTrustUI();
+        }
+
+        function updateTrustUI() {
+            const el = document.getElementById('trust-score-display');
+            const percent = Math.round(proctor.trustScore * 100);
+            el.innerHTML = `<i class="bi bi-shield-check ${percent > 70 ? 'text-success' : 'text-danger'} me-1"></i> Trust Score: ${percent}%`;
+        }
+
+        async function captureSnapshot(issueType = null) {
+            if (!proctor.stream) return;
+
+            const video = document.getElementById('webcam-feed');
+            const canvas = document.createElement('canvas');
+            canvas.width = 320;
+            canvas.height = 240;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Convert to blob
+            canvas.toBlob(async (blob) => {
+                if (!blob) return;
+
+                const formData = new FormData();
+                formData.append('image', blob, 'snapshot.jpg');
+                formData.append('trust_score', proctor.trustScore);
+                if (issueType) formData.append('issue_type', issueType);
+
+                // Add dummy face data for dashboard visual (simulated)
+                // In real app, we'd use face-api.js here
+                const faceData = { x: 0.25, y: 0.25, width: 0.5, height: 0.5 };
+                formData.append('face_data', JSON.stringify(faceData));
+
+                try {
+                    await API.request(`/sessions/${session.id}/snapshot/`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                } catch (e) {
+                    console.error("Snapshot upload failed", e);
+                }
+            }, 'image/jpeg', 0.7);
+        }
+
+        // Timer
+        function startTimer(seconds) {
+            let left = seconds;
+            updateTimerUI(left);
+            timerInterval = setInterval(() => {
+                left--;
+                if (left <= 0) {
+                    clearInterval(timerInterval);
+                    finishExam(true);
+                }
+                updateTimerUI(left);
+            }, 1000);
+        }
+
+        function updateTimerUI(seconds) {
+            if (seconds < 0) seconds = 0;
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = seconds % 60;
+            const text = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            const el = document.getElementById('timer-display');
+            el.textContent = text;
+            if (seconds < 300) document.getElementById('timer-badge').classList.add('timer-warning'); // Red if < 5 mins
+        }
+
+        // Navigation
+        function navQuestion(delta) {
+            const newIndex = currentIndex + delta;
+            if (newIndex >= 0 && newIndex < questions.length) loadQuestion(newIndex);
+        }
+
+        function loadQuestion(idx) {
+            currentIndex = idx;
+            const q = questions[idx];
+
+            document.getElementById('q-index').textContent = idx + 1;
+            document.getElementById('q-index').textContent = idx + 1;
+
+            // Format Points & Metadata
+            const pointsText = q.points + (q.points == 1 ? ' Point' : ' Points');
+            let metaHtml = `<span class="badge bg-primary bg-opacity-10 text-primary">${pointsText}</span>`;
+
+            if (q.category_name) {
+                metaHtml += `<span class="badge bg-secondary bg-opacity-10 text-secondary ms-2">${q.category_name}</span>`;
+            }
+
+            document.getElementById('q-points').innerHTML = metaHtml;
+            document.getElementById('q-text-content').innerHTML = q.question_text.replace(/\n/g, '<br>');
+
+            // Render Options
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            if (q.question_type === 'multiple_choice' || q.question_type === 'true_false') {
+                if (q.options && q.options.length > 0) {
+                    q.options.forEach((opt, i) => {
+                        const isSelected = answers[q.id] == opt.id;
+                        const div = document.createElement('div');
+                        div.className = 'option-item';
+                        div.innerHTML = `
+                            <input type="radio" name="q_opt" id="opt_${opt.id}" class="option-input" 
+                                value="${opt.id}" ${isSelected ? 'checked' : ''} onchange="handleAnswer(${q.id}, ${opt.id})">
+                            <label for="opt_${opt.id}" class="option-card">
+                                <div class="option-key">${String.fromCharCode(65 + i)}</div>
+                                <span class="fw-medium">${opt.option_text}</span>
+                            </label>
+                        `;
+                        container.appendChild(div);
+                    });
+                } else {
+                    container.innerHTML = '<div class="alert alert-warning">No options configured for this question.</div>';
+                }
+            }
+
+            // Buttons State
+            document.getElementById('btn-prev').disabled = idx === 0;
+            document.getElementById('btn-next').disabled = idx === questions.length - 1;
+
+            // Flag State
+            const flagBtn = document.getElementById('flag-text');
+            if (flags.has(q.id)) {
+                flagBtn.textContent = 'Unflag';
+                flagBtn.parentElement.classList.add('text-warning');
+            } else {
+                flagBtn.textContent = 'Flag';
+                flagBtn.parentElement.classList.remove('text-warning');
+            }
+
+            updateGridUI();
+        }
+
+        async function handleAnswer(qId, optId) {
+            answers[qId] = optId;
+            updateGridUI();
+
+            // Auto Save
+            try {
+                await API.examinations.submitAnswer(session.id, {
+                    question_id: qId,
+                    selected_option_id: optId // Correct payload
+                });
+            } catch (e) {
+                console.error("Save failed", e);
+                // Simple retry logic or UI indicator could go here
+            }
+        }
+
+        function toggleFlag() {
+            const q = questions[currentIndex];
+            if (flags.has(q.id)) flags.delete(q.id);
+            else flags.add(q.id);
+            loadQuestion(currentIndex); // Refresh UI
+        }
+
+        function renderGrid() {
+            const grid = document.getElementById('question-grid');
+            grid.innerHTML = questions.map((q, i) => `
+                <button class="map-btn" id="map-btn-${i}" onclick="loadQuestion(${i})">
+                    ${i + 1}
+                </button>
+            `).join('');
+            updateGridUI();
+        }
+
+        function updateGridUI() {
+            questions.forEach((q, i) => {
+                const btn = document.getElementById(`map-btn-${i}`);
+                if (!btn) return;
+
+                btn.className = 'map-btn'; // Reset
+                if (i === currentIndex) btn.classList.add('active');
+                else if (answers[q.id]) btn.classList.add('answered');
+
+                if (flags.has(q.id)) btn.classList.add('flagged');
+            });
+
+            // Progress Text
+            const answeredCount = Object.keys(answers).length;
+            document.getElementById('progress-text').textContent = `${answeredCount}/${questions.length}`;
+        }
+
+        async function finishExam(force = false) {
+            const answered = Object.keys(answers).length;
+            const total = questions.length;
+
+            if (!force) {
+                if (answered < total) {
+                    if (!confirm(`You have answered ${answered} out of ${total} questions. Are you sure you want to submit?`)) return;
+                } else {
+                    if (!confirm("Are you sure you want to submit your exam now?")) return;
+                }
+            }
+
+            try {
+                document.body.style.opacity = '0.5';
+                await API.examinations.submitExam(session.id);
+                window.location.href = '/frontend/results.html?session_id=' + session.id; // Or standard results page
+            } catch (e) {
+                document.body.style.opacity = '1';
+                alert('Submission failed: ' + e.message);
+            }
+        }
+
+        // Network Status
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+        function updateOnlineStatus() {
+            const el = document.getElementById('connection-status');
+            if (navigator.onLine) {
+                el.className = 'status-badge status-online';
+                el.innerHTML = '<i class="bi bi-wifi"></i> <span>Online</span>';
+            } else {
+                el.className = 'status-badge status-offline';
+                el.innerHTML = '<i class="bi bi-wifi-off"></i> <span>Offline</span>';
+            }
+        }
+
+        // Tab Focus Tracking (Simple)
+        let focusWarnings = 0;
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) {
+                focusWarnings++;
+                // console.log("User left the tab!", focusWarnings);
+                // We could log this to backend
+            }
+        });
+
+    </script>
+</body>
+
+</html>

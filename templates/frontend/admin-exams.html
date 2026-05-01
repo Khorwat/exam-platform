@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exams Management | IT College</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons & Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --font-heading: 'Plus Jakarta Sans', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --sidebar-width: 280px;
+            --sidebar-bg: #0f172a;
+            --accent-primary: #6366f1;
+            --bg-light: #f8fafc;
+            --text-dark: #1e293b;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-light);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            color: #94a3b8;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 1000;
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+
+        .brand-section {
+            padding: 0 0.75rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: white;
+            font-family: var(--font-heading);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-icon {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        }
+
+        .nav-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .nav-item-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            color: #94a3b8;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .nav-item-link:hover,
+        .nav-item-link.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-item-link.active {
+            background: var(--accent-primary);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Nav Command */
+        .nav-command {
+            background: linear-gradient(45deg, #ef4444, #b91c1c);
+            color: white !important;
+            margin-top: 2rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 2rem;
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        /* Header */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title h1 {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1.75rem;
+            color: var(--text-dark);
+            margin: 0;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            background: white;
+            padding: 1rem;
+            border-radius: 1rem;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* View Toggle */
+        .view-toggle .btn {
+            border: 1px solid #e2e8f0;
+            color: #64748b;
+        }
+
+        .view-toggle .btn.active {
+            background-color: #f1f5f9;
+            color: var(--text-dark);
+            border-color: #cbd5e1;
+        }
+
+        /* Exam Cards (Grid View) */
+        .exam-card {
+            background: white;
+            border-radius: 1rem;
+            border: 1px solid #e2e8f0;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.2s;
+            height: 100%;
+        }
+
+        .exam-card:hover {
+            border-color: var(--accent-primary);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* Badge Styles */
+        .badge-draft {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .badge-active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        @media (max-width: 991px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .mobile-toggle {
+                display: block !important;
+            }
+        }
+    </style>
+    <style>
+        .admin-only.d-none {
+            display: none !important;
+        }
+
+        /* Custom Hover Colors */
+        .nav-link-admin:hover,
+        body.admin-mode .nav-link-admin.active {
+            background: rgba(245, 158, 11, 0.15) !important;
+            color: #f59e0b !important;
+        }
+
+        #alert-container {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 9999;
+            /* Higher than Bootstrap modal (1055) */
+            min-width: 300px;
+        }
+
+        .nav-link-academic:hover,
+        .nav-link-academic.active {
+            background: rgba(56, 189, 248, 0.15) !important;
+            color: #38bdf8 !important;
+        }
+    </style>
+    <script>
+        if (localStorage.getItem('user_role') === 'administrator') {
+            document.write('<style>.admin-only { display: block !important; }</style>');
+        }
+    </script>
+</head>
+
+<body>
+    <div id="alert-container"></div>
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="brand-section">
+            <div class="brand-icon rounded p-1">
+                <i class="bi bi-mortarboard-fill fs-4 text-white"></i>
+            </div>
+            <span>IT College<br><small class="fw-normal opacity-75" style="font-size: 0.7rem">Academic
+                    Management</small></span>
+        </div>
+
+        <div class="nav-section flex-grow-1 overflow-y-auto"
+            style="scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.2) transparent;">
+            <div class="d-flex flex-column gap-1">
+                <small class="text-uppercase fw-bold px-3 mb-2 mt-2 text-muted"
+                    style="font-size: 0.7rem; letter-spacing: 1px;">Administration</small>
+                <a href="/frontend/admin.html" class="nav-item-link nav-link-admin">
+                    <i class="bi bi-grid-1x2-fill"></i> Dashboard
+                </a>
+
+                <!-- Admin Only Section -->
+                <div class="admin-only">
+                    <a href="/frontend/admin-users.html" class="nav-item-link nav-link-admin">
+                        <i class="bi bi-people-fill"></i> Users
+                    </a>
+                    <a href="/frontend/admin-announcements.html" class="nav-item-link nav-link-admin">
+                        <i class="bi bi-megaphone-fill"></i> Announcements
+                    </a>
+                    <a href="/frontend/admin-logs.html" class="nav-item-link nav-link-admin">
+                        <i class="bi bi-shield-lock-fill"></i> Logs
+                    </a>
+                    <a href="/frontend/admin-settings.html" class="nav-item-link nav-link-admin">
+                        <i class="bi bi-gear-fill"></i> Settings
+                    </a>
+                </div>
+
+                <small class="text-uppercase fw-bold px-3 mb-2 mt-3 text-info"
+                    style="font-size: 0.7rem; letter-spacing: 1px;">Academic</small>
+                <a href="/frontend/admin-exams.html" class="nav-item-link active nav-link-academic">
+                    <i class="bi bi-file-earmark-text text-info"></i> Exams
+                </a>
+                <a href="/frontend/admin-questions.html" class="nav-item-link nav-link-academic">
+                    <i class="bi bi-hdd-stack-fill text-info"></i> Question Bank
+                </a>
+                <a href="/frontend/admin-analytics.html" class="nav-item-link nav-link-academic">
+                    <i class="bi bi-bar-chart-fill text-info"></i> Analytics
+                </a>
+                <a href="/frontend/grading.html" class="nav-item-link nav-link-academic">
+                    <i class="bi bi-check-circle text-info"></i> Grading
+                </a>
+                <a href="/frontend/admin-monitor.html" class="nav-item-link nav-link-academic"
+                    style="color: #ef4444 !important;">
+                    <i class="bi bi-camera-video-fill" style="color: #ef4444 !important;"></i> Live Command
+                </a>
+            </div>
+        </div>
+
+        <div class="mt-auto pt-3 border-top border-secondary border-opacity-25">
+            <a href="#" onclick="window.utils ? window.utils.logout() : window.location.href='/frontend/login.html'"
+                class="nav-item-link text-danger">
+                <i class="bi bi-box-arrow-left"></i> Sign Out
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Mobile Toggle -->
+        <button class="btn btn-dark d-lg-none mb-3 mobile-toggle" style="display:none">
+            <i class="bi bi-list"></i> Menu
+        </button>
+
+        <header class="dashboard-header">
+            <div class="page-title">
+                <p class="text-muted mb-1 small fw-medium text-uppercase">Management</p>
+                <h1>Exams</h1>
+            </div>
+
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-primary rounded-pill px-4" onclick="openCreateModal()">
+                    <i class="bi bi-plus-lg me-2"></i> Create New Exam
+                </button>
+                <div class="dropdown">
+                    <a href="#" class="text-decoration-none d-flex align-items-center gap-2" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        <div class="user-profile">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
+                                style="width: 32px; height: 32px; overflow: hidden;">
+                                <img id="header-avatar" src="" class="w-100 h-100 d-none" style="object-fit:cover;">
+                                <i class="bi bi-person-fill" id="header-icon"></i>
+                            </div>
+                            <div>
+                                <span class="d-block fw-bold text-dark small" id="user-name">User</span>
+                            </div>
+                        </div>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2">
+                        <li><a class="dropdown-item py-2" href="/frontend/profile.html"><i
+                                    class="bi bi-person me-2"></i>My Profile</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item py-2 text-danger" href="#"
+                                onclick="window.utils ? window.utils.logout() : window.location.href='/frontend/login.html'"><i
+                                    class="bi bi-box-arrow-right me-2"></i>Sign Out</a></li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+
+        <!-- Toolbar -->
+        <div class="toolbar shadow-sm">
+            <div class="d-flex gap-3 flex-grow-1">
+                <div class="position-relative flex-grow-1" style="max-width: 400px;">
+                    <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-secondary"></i>
+                    <input type="text" class="form-control ps-5 rounded-pill bg-light border-0"
+                        placeholder="Search exams..." id="searchInput" onkeyup="filterExams()">
+                </div>
+                <select class="form-select rounded-pill bg-light border-0" style="width: auto;" id="statusFilter"
+                    onchange="filterExams()">
+                    <option value="all">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="draft">Draft</option>
+                </select>
+                <select class="form-select rounded-pill bg-light border-0" style="width: auto;" id="sortFilter"
+                    onchange="filterExams()">
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="az">Title A-Z</option>
+                </select>
+            </div>
+
+            <div class="btn-group view-toggle" role="group">
+                <button type="button" class="btn btn-sm active" onclick="setViewMode('grid')" id="btn-grid"
+                    title="Grid View"><i class="bi bi-grid-fill"></i></button>
+                <button type="button" class="btn btn-sm" onclick="setViewMode('list')" id="btn-list"
+                    title="List View"><i class="bi bi-list-ul"></i></button>
+            </div>
+        </div>
+
+        <div id="exams-container">
+            <div class="text-center p-5">
+                <div class="spinner-border text-primary" role="status"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Create/Edit Exam Modal (Same as before, abbreviated here for brevity but fully functional in real implementation) -->
+    <!-- ... Copied Modal Structure ... -->
+    <div class="modal fade" id="examModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header border-bottom bg-light">
+                    <h5 class="modal-title fw-bold font-heading" id="modalTitle">Create Exam</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <!-- Wizard Steps -->
+                    <ul class="nav nav-pills mb-4 nav-fill p-2 bg-light rounded" id="wizardTabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-step="1" href="#">1. Basic Info</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link disabled" data-step="2" href="#">2. Manage Questions</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link disabled" data-step="3" href="#">3. Review</a>
+                        </li>
+                    </ul>
+
+                    <form id="examForm">
+                        <input type="hidden" id="examId">
+
+                        <!-- Step 1: Basic Info -->
+                        <div class="step-content" id="step1">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-uppercase">Exam Title</label>
+                                <input type="text" class="form-control form-control-lg" id="examTitle" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-uppercase">Description</label>
+                                <textarea class="form-control" id="examDescription" rows="3"></textarea>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small text-uppercase">Duration (minutes)</label>
+                                    <input type="number" class="form-control" id="examDuration" value="60" min="1"
+                                        required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small text-uppercase">Passing Score (%)</label>
+                                    <input type="number" class="form-control" id="examPassingScore" value="50" min="0"
+                                        max="100" required>
+                                </div>
+                            </div>
+
+                            <div class="bg-light p-3 rounded">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-check form-switch mb-2">
+                                            <input class="form-check-input" type="checkbox" id="examRandomizeQuestions">
+                                            <label class="form-check-label">Randomize Questions</label>
+                                        </div>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="examRandomizeOptions">
+                                            <label class="form-check-label">Randomize Options</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check form-switch mb-2">
+                                            <input class="form-check-input" type="checkbox" id="examAllowRetake">
+                                            <label class="form-check-label">Allow Retakes</label>
+                                        </div>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="examShowResults">
+                                            <label class="form-check-label">Show Results Immediately</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Manage Questions -->
+                        <div class="step-content d-none" id="step2">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="fw-bold m-0">Exam Questions</h5>
+                                <div>
+                                    <button type="button" class="btn btn-outline-primary" onclick="showQuestionBank()">
+                                        <i class="bi bi-search"></i> Add from Bank
+                                    </button>
+                                    <button type="button" class="btn btn-primary" onclick="showCreateQuestionForm()">
+                                        <i class="bi bi-plus-lg"></i> Create New
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive border rounded p-0 bg-white"
+                                style="max-height: 400px; overflow-y: auto;">
+                                <table class="table table-hover mb-0" id="selectedQuestionsTable">
+                                    <thead class="table-light sticky-top">
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Question</th>
+                                            <th>Type</th>
+                                            <th>Pts</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="selectedQuestionsBody">
+                                        <!-- Selected questions injected here -->
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted p-4">No questions added yet.
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="mt-2 text-end text-muted">
+                                Total Points: <span id="totalPointsDisplay" class="fw-bold">0</span>
+                            </div>
+                        </div>
+
+                        <!-- Add from Bank View (Hidden) -->
+                        <div class="step-content d-none" id="step2-bank">
+                            <div class="d-flex justify-content-between mb-3">
+                                <h5>Select from Question Bank</h5>
+                                <button type="button" class="btn btn-secondary btn-sm"
+                                    onclick="showManageQuestions()">Back to List</button>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="card border-0 shadow-sm">
+                                        <div class="card-header bg-light">Filters</div>
+                                        <div class="card-body">
+                                            <input type="text" class="form-control mb-3" id="bankSearch"
+                                                placeholder="Search questions..." onkeyup="filterBankQuestions()">
+                                            <select class="form-select mb-2" id="filterCategory"
+                                                onchange="filterBankQuestions()">
+                                                <option value="">All Categories</option>
+                                            </select>
+                                            <select class="form-select mb-3" id="filterType"
+                                                onchange="filterBankQuestions()">
+                                                <option value="">All Types</option>
+                                                <option value="multiple_choice">Multiple Choice</option>
+                                                <option value="true_false">True/False</option>
+                                            </select>
+
+                                            <div class="form-check border-top pt-2">
+                                                <input class="form-check-input" type="checkbox" id="selectAllCheck"
+                                                    onchange="toggleSelectAll()">
+                                                <label class="form-check-label fw-bold small text-primary"
+                                                    for="selectAllCheck">
+                                                    Select All Visible
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="list-group" id="questionSelectionList"
+                                        style="max-height: 400px; overflow-y: auto;">
+                                        <!-- Questions loaded here -->
+                                        <div class="text-center p-3 text-muted">Loading available questions...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Create Question View (Hidden) -->
+                        <div class="step-content d-none" id="step2-create">
+                            <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
+                                <h5>Create New Question</h5>
+                                <button type="button" class="btn btn-secondary btn-sm"
+                                    onclick="showManageQuestions()">Cancel</button>
+                            </div>
+
+                            <form id="questionForm">
+                                <div class="mb-3">
+                                    <label class="form-label">Question Text</label>
+                                    <textarea class="form-control" id="questionText" rows="2" required
+                                        placeholder="Enter your question here..."></textarea>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Question Type</label>
+                                        <select class="form-select" id="questionType" onchange="handleTypeChange()"
+                                            required>
+                                            <option value="multiple_choice">Multiple Choice</option>
+                                            <option value="true_false">True/False</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Points</label>
+                                        <input type="number" class="form-control" id="questionPoints" value="1" min="1"
+                                            required>
+                                    </div>
+                                </div>
+
+                                <div id="optionsContainer" class="mb-3 bg-light p-3 rounded">
+                                    <label class="form-label d-flex justify-content-between">
+                                        Options
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" id="btnAddOption"
+                                            onclick="addOption()">
+                                            <i class="bi bi-plus"></i> Add Option
+                                        </button>
+                                    </label>
+                                    <div id="optionsList"></div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Explanation (Optional)</label>
+                                    <textarea class="form-control" id="questionExplanation" rows="2"
+                                        placeholder="Helpful context for students after the exam"></textarea>
+                                </div>
+
+                                <div id="queuedQuestionsContainer" class="mb-3 d-none">
+                                    <div class="card bg-warning bg-opacity-10 border-warning">
+                                        <div class="card-body py-2">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <strong class="text-dark">
+                                                    <i class="bi bi-stack"></i> <span id="queueCount">0</span> Questions
+                                                    in Queue
+                                                </strong>
+                                                <button type="button" class="btn btn-sm btn-outline-danger"
+                                                    onclick="clearQueue()">Clear Queue</button>
+                                            </div>
+                                            <ul id="queuedQuestionsList"
+                                                class="list-unstyled mt-2 mb-0 small text-muted"></ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="text-end gap-2 d-flex justify-content-end pt-2 border-top">
+                                    <button type="button" class="btn btn-outline-secondary" onclick="addToQueue()">
+                                        <i class="bi bi-plus-circle"></i> Add to Queue
+                                    </button>
+                                    <button type="button" class="btn btn-success" onclick="saveAllQueuedQuestions()">
+                                        <i class="bi bi-cloud-upload"></i> Save All (<span id="saveAllCount">0</span>)
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Step 3: Review -->
+                        <div class="step-content d-none" id="step3">
+                            <div class="text-center mb-4">
+                                <h3 id="reviewTitle" class="font-heading fw-bold"></h3>
+                                <p id="reviewDescription" class="text-muted"></p>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="p-3 bg-light rounded h-100">
+                                        <h6 class="text-uppercase small fw-bold text-muted">Settings</h6>
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span>Duration:</span>
+                                            <span class="fw-bold"><span id="reviewDuration"></span> mins</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <span>Passing Score:</span>
+                                            <span class="fw-bold"><span id="reviewPassing"></span>%</span>
+                                        </div>
+                                        <div class="mt-3 pt-3 border-top">
+                                            <h6 class="small fw-bold text-muted">Options</h6>
+                                            <span class="badge bg-light text-dark border me-1" id="badgeRandomQ">Rand
+                                                Qs</span>
+                                            <span class="badge bg-light text-dark border me-1" id="badgeRandomO">Rand
+                                                Opts</span>
+                                            <span class="badge bg-light text-dark border"
+                                                id="badgeRetake">Retakes</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="p-3 bg-light rounded h-100">
+                                        <h6 class="text-uppercase small fw-bold text-muted">Content</h6>
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span>Questions:</span>
+                                            <span class="fw-bold" id="reviewQuestionCount"></span>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <span>Total Points:</span>
+                                            <span class="fw-bold" id="reviewTotalPoints"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div
+                                class="form-check form-switch mt-4 p-3 border rounded bg-success bg-opacity-10 border-success">
+                                <input class="form-check-input" type="checkbox" id="examIsActive" checked>
+                                <label class="form-check-label fw-bold text-success">Make Exam Active
+                                    Immediately</label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-outline-secondary" id="prevBtn" onclick="changeStep(-1)"
+                        disabled>Previous</button>
+                    <button type="button" class="btn btn-primary" id="nextBtn" onclick="changeStep(1)">Next
+                        Step</button>
+                    <button type="button" class="btn btn-success d-none" id="saveBtn" onclick="saveExam()">Create
+                        Exam</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logic -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/api.js?v=2"></script>
+    <script src="/static/js/app.js"></script>
+    <script>
+        let examModal;
+        let currentStep = 1;
+        let selectedQuestionsMap = new Map(); // id -> question object
+        let questionsCache = [];
+        let createdQuestions = []; // Track temporarily created questions before save
+        let queuedQuestions = []; // Questions waiting to be saved in bulk
+
+        let allExams = []; // Store fetched exams locally for filtering
+        let viewMode = 'grid'; // 'grid' or 'list'
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Auth User Name Check
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            if (user.role === 'administrator' || user.is_staff) document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('d-none'));
+
+            if (!utils.requireAuth()) return; // check auth
+
+            examModal = new bootstrap.Modal(document.getElementById('examModal'));
+            await loadExams();
+            loadCategories();
+
+            // Mobile toggle
+            document.querySelector('.mobile-toggle').addEventListener('click', () => {
+                document.querySelector('.sidebar').style.transform = 'translateX(0)';
+            });
+            document.addEventListener('click', (e) => {
+                if (window.innerWidth < 992 && !e.target.closest('.sidebar') && !e.target.closest('.mobile-toggle')) {
+                    document.querySelector('.sidebar').style.transform = 'translateX(-100%)';
+                }
+            });
+        });
+
+        // --- Toolbar View Logic ---
+        function setViewMode(mode) {
+            viewMode = mode;
+            document.getElementById('btn-grid').classList.toggle('active', mode === 'grid');
+            document.getElementById('btn-list').classList.toggle('active', mode === 'list');
+            filterExams(); // Re-render
+        }
+
+        async function loadExams() {
+            const container = document.getElementById('exams-container');
+            container.innerHTML = '<div class="text-center p-5"><div class="spinner-border"></div></div>';
+
+            try {
+                const response = await API.exams.list();
+                allExams = response.results || response;
+                filterExams();
+            } catch (error) {
+                container.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+            }
+        }
+
+        function filterExams() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const status = document.getElementById('statusFilter').value;
+            const sort = document.getElementById('sortFilter').value;
+
+            let filtered = allExams.filter(exam => {
+                const matchesSearch = exam.title.toLowerCase().includes(search) || (exam.description || '').toLowerCase().includes(search);
+                const matchesStatus = status === 'all'
+                    ? true
+                    : (status === 'active' ? exam.is_active : !exam.is_active);
+                return matchesSearch && matchesStatus;
+            });
+
+            // Sorting
+            filtered.sort((a, b) => {
+                const dateA = new Date(a.created_at || 0);
+                const dateB = new Date(b.created_at || 0);
+
+                if (sort === 'newest') return dateB - dateA;
+                if (sort === 'oldest') return dateA - dateB;
+                if (sort === 'az') return a.title.localeCompare(b.title);
+                return 0;
+            });
+
+            renderExams(filtered);
+        }
+
+        function renderExams(exams) {
+            const container = document.getElementById('exams-container');
+
+            if (exams.length === 0) {
+                container.innerHTML = '<div class="alert alert-info border-0 shadow-sm text-center py-4 text-muted">No exams match your criteria.</div>';
+                return;
+            }
+
+            if (viewMode === 'grid') {
+                container.innerHTML = `<div class="row g-4">` + exams.map(exam => `
+                    <div class="col-md-6 col-lg-4">
+                        <div class="exam-card d-flex flex-column h-100">
+                             <div class="d-flex justify-content-between align-items-start mb-3">
+                                 <div class="rounded-circle bg-light p-3 d-flex align-items-center justify-content-center text-primary" style="width: 50px; height: 50px;">
+                                    <i class="bi bi-file-text-fill fs-5"></i>
+                                </div>
+                                ${exam.is_active
+                        ? '<span class="badge badge-active rounded-pill px-3">Active</span>'
+                        : '<span class="badge badge-draft rounded-pill px-3">Draft</span>'}
+                             </div>
+                             
+                             <h5 class="mb-1 fw-bold text-dark">${exam.title}</h5>
+                             <p class="text-muted small mb-3 flex-grow-1">${(exam.description || 'No description').substring(0, 100)}...</p>
+                             
+                             <div class="d-flex gap-3 text-secondary small mb-3">
+                                <span><i class="bi bi-clock me-1"></i> ${exam.duration_minutes}m</span>
+                                <span><i class="bi bi-collection me-1"></i> ${exam.question_count} Qs</span>
+                            </div>
+
+                            <div class="d-flex gap-2 mt-auto">
+                                <a href="/frontend/exam-results.html?exam_id=${exam.id}" class="btn btn-sm btn-outline-dark flex-grow-1 rounded-pill">Results</a>
+                                <button class="btn btn-sm btn-outline-primary flex-grow-1 rounded-pill" onclick="editExam(${exam.id})">Edit</button>
+                                <button class="btn btn-sm btn-outline-danger w-auto px-3 rounded-pill" onclick="deleteExam(${exam.id})"><i class="bi bi-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('') + `</div>`;
+            } else {
+                // List View
+                container.innerHTML = `
+                <div class="card border-0 shadow-sm overflow-hidden">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 align-middle">
+                            <thead class="bg-light text-secondary">
+                                <tr>
+                                    <th class="ps-4">Title</th>
+                                    <th>Status</th>
+                                    <th>Duration</th>
+                                    <th>Questions</th>
+                                    <th>Pass Score</th>
+                                    <th class="text-end pe-4">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${exams.map(exam => `
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="fw-bold text-dark">${exam.title}</div>
+                                        <div class="small text-muted">${(exam.description || '').substring(0, 50)}</div>
+                                    </td>
+                                    <td>
+                                         ${exam.is_active
+                        ? '<span class="badge badge-active rounded-pill">Active</span>'
+                        : '<span class="badge badge-draft rounded-pill">Draft</span>'}
+                                    </td>
+                                    <td>${exam.duration_minutes} mins</td>
+                                    <td>${exam.question_count}</td>
+                                    <td>${exam.passing_score}%</td>
+                                    <td class="text-end pe-4">
+                                         <a href="/frontend/exam-results.html?exam_id=${exam.id}" class="btn btn-sm btn-link text-dark text-decoration-none" title="View Results"><i class="bi bi-bar-chart-fill"></i></a>
+                                         <button class="btn btn-sm btn-link text-primary text-decoration-none" onclick="editExam(${exam.id})" title="Edit"><i class="bi bi-pencil"></i></button>
+                                         <button class="btn btn-sm btn-link text-danger text-decoration-none" onclick="deleteExam(${exam.id})" title="Delete"><i class="bi bi-trash"></i></button>
+                                    </td>
+                                </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>`;
+            }
+        }
+
+        // --- Existing Functions (LoadCategories, Modal Logic, etc) ---
+        // Need to include them all here or else they break. 
+        // I will copy the previous modal Logic verbatim below.
+
+        async function loadCategories() {
+            try {
+                const response = await API.questions.getCategories();
+                const categories = response.results || response;
+                const options = categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+                if (document.getElementById('filterCategory')) {
+                    const currentVal = document.getElementById('filterCategory').value;
+                    document.getElementById('filterCategory').innerHTML = '<option value="">All Categories</option>' + options;
+                    document.getElementById('filterCategory').value = currentVal;
+                }
+            } catch (e) { console.error('Error loading categories:', e); }
+        }
+
+        function openCreateModal() {
+            document.getElementById('modalTitle').textContent = 'Create Exam';
+            document.getElementById('examId').value = '';
+            document.getElementById('examForm').reset();
+            document.getElementById('saveBtn').textContent = 'Create Exam';
+            selectedQuestionsMap.clear();
+            createdQuestions = [];
+            renderSelectedQuestionsTable();
+            goToStep(1);
+            examModal.show();
+        }
+
+        let allBankQuestions = []; // Store all fetched questions
+
+        async function loadQuestions() {
+            const list = document.getElementById('questionSelectionList');
+            list.innerHTML = '<div class="text-center p-3"><div class="spinner-border spinner-border-sm"></div></div>';
+
+            try {
+                const response = await API.questions.list({ is_active: true });
+                allBankQuestions = response.results || response;
+                filterBankQuestions(); // Initial render
+            } catch (error) {
+                console.error(error);
+                list.innerHTML = '<div class="text-danger">Error loading questions</div>';
+            }
+        }
+
+        function filterBankQuestions() {
+            const search = document.getElementById('bankSearch').value.toLowerCase();
+            const category = document.getElementById('filterCategory').value;
+            const type = document.getElementById('filterType').value;
+
+            questionsCache = allBankQuestions.filter(q => {
+                const matchesSearch = q.question_text.toLowerCase().includes(search);
+                const matchesCategory = category ? (q.category && q.category.id == category) || (q.category == category) : true;
+                const matchesType = type ? q.question_type === type : true;
+                return matchesSearch && matchesCategory && matchesType;
+            });
+
+            renderQuestionsList();
+        }
+
+        function renderQuestionsList() {
+            const list = document.getElementById('questionSelectionList');
+
+            // Check select all box state
+            const allSelected = questionsCache.length > 0 && questionsCache.every(q => selectedQuestionsMap.has(q.id));
+            const selectAllCheck = document.getElementById('selectAllCheck');
+            if (selectAllCheck) {
+                selectAllCheck.checked = allSelected;
+                selectAllCheck.indeterminate = !allSelected && questionsCache.some(q => selectedQuestionsMap.has(q.id));
+            }
+
+            if (questionsCache.length === 0) { list.innerHTML = '<div class="p-3 text-muted">No questions found matching filters.</div>'; return; }
+            list.innerHTML = questionsCache.map(q => `
+                <label class="list-group-item d-flex gap-2 border-0 border-bottom">
+                    <input class="form-check-input flex-shrink-0 question-checkbox" type="checkbox" 
+                           value="${q.id}" ${selectedQuestionsMap.has(q.id) ? 'checked' : ''}
+                           onchange="toggleQuestionFromBank(${q.id}, this.checked)">
+                    <span class="w-100">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <strong>${q.question_text}</strong>
+                            <span class="badge bg-light text-dark border">${q.points} pts</span>
+                        </div>
+                        <small class="text-muted">${q.question_type} | ${q.category_name || 'General'}</small>
+                    </span>
+                </label>
+            `).join('');
+        }
+
+        function toggleSelectAll() {
+            const checked = document.getElementById('selectAllCheck').checked;
+            questionsCache.forEach(q => {
+                if (checked) selectedQuestionsMap.set(q.id, q);
+                else selectedQuestionsMap.delete(q.id);
+            });
+            renderQuestionsList(); // Update checkboxes
+            renderSelectedQuestionsTable(); // Update usage
+        }
+
+        function toggleQuestionFromBank(id, checked) {
+            if (checked) {
+                const q = questionsCache.find(q => q.id === id);
+                if (q) selectedQuestionsMap.set(id, q);
+            } else { selectedQuestionsMap.delete(id); }
+            renderSelectedQuestionsTable();
+        }
+
+        function renderSelectedQuestionsTable() {
+            const tbody = document.getElementById('selectedQuestionsBody');
+            const questions = Array.from(selectedQuestionsMap.values());
+            if (questions.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted p-4">No questions added yet.</td></tr>';
+                document.getElementById('totalPointsDisplay').textContent = '0';
+                return;
+            }
+            let totalPoints = 0;
+            tbody.innerHTML = questions.map((q, index) => {
+                totalPoints += parseFloat(q.points);
+                return `<tr>
+                    <td>${index + 1}</td>
+                    <td>${(q.question_text || '').substring(0, 50)}...</td>
+                    <td><span class="badge bg-secondary opacity-75">${q.question_type}</span></td>
+                    <td>${q.points}</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeQuestion(${q.id})"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>`;
+            }).join('');
+            document.getElementById('totalPointsDisplay').textContent = totalPoints;
+        }
+
+        function removeQuestion(id) {
+            selectedQuestionsMap.delete(id);
+            renderSelectedQuestionsTable();
+            const checkbox = document.querySelector(`input[value="${id}"]`);
+            if (checkbox) checkbox.checked = false;
+        }
+
+        function changeStep(delta) {
+            const newStep = currentStep + delta;
+
+            // Validation Logic when moving forward
+            if (delta > 0) {
+                if (currentStep === 1) {
+                    const title = document.getElementById('examTitle').value.trim();
+                    const duration = document.getElementById('examDuration').value;
+                    const passing = document.getElementById('examPassingScore').value;
+
+                    if (!title) { utils.showAlert('Please enter an Exam Title.', 'warning'); return; }
+                    if (!duration || duration < 1) { utils.showAlert('Duration must be at least 1 minute.', 'warning'); return; }
+                    if (!passing || passing < 0 || passing > 100) { utils.showAlert('Passing score must be between 0 and 100.', 'warning'); return; }
+                }
+
+                if (currentStep === 2 && newStep === 3) {
+                    if (selectedQuestionsMap.size === 0) {
+                        utils.showAlert('Please add at least one question to the exam.', 'warning');
+                        return;
+                    }
+                }
+            }
+
+            goToStep(newStep);
+        }
+        function goToStep(step) {
+            currentStep = step;
+            document.querySelectorAll('#wizardTabs .nav-link').forEach(link => {
+                const linkStep = parseInt(link.dataset.step);
+                link.classList.remove('active', 'disabled');
+                if (linkStep === step) link.classList.add('active');
+                else if (linkStep < step) link.classList.add('disabled');
+                else link.classList.add('disabled');
+            });
+            document.querySelectorAll('.step-content').forEach(el => el.classList.add('d-none'));
+            if (step === 2) showManageQuestions();
+            else document.getElementById(`step${step}`).classList.remove('d-none');
+            document.getElementById('prevBtn').disabled = step === 1;
+            if (step === 3) {
+                document.getElementById('nextBtn').classList.add('d-none');
+                document.getElementById('saveBtn').classList.remove('d-none');
+                updateReviewStep();
+            } else {
+                document.getElementById('nextBtn').classList.remove('d-none');
+                document.getElementById('saveBtn').classList.add('d-none');
+            }
+        }
+
+        function showManageQuestions() {
+            document.querySelectorAll('.step-content').forEach(el => el.classList.add('d-none'));
+            document.getElementById('step2').classList.remove('d-none');
+        }
+        function showQuestionBank() {
+            document.querySelectorAll('.step-content').forEach(el => el.classList.add('d-none'));
+            document.getElementById('step2-bank').classList.remove('d-none');
+            if (questionsCache.length === 0) loadQuestions();
+            setTimeout(() => document.getElementById('bankSearch').focus(), 100);
+        }
+        function showCreateQuestionForm() {
+            document.querySelectorAll('.step-content').forEach(el => el.classList.add('d-none'));
+            document.getElementById('step2-create').classList.remove('d-none');
+            document.getElementById('questionForm').reset();
+            // Reset options for MD
+            document.getElementById('optionsList').innerHTML = '';
+            addOption(); addOption();
+        }
+
+        function addOption() {
+            const list = document.getElementById('optionsList');
+            const idx = list.children.length;
+            const div = document.createElement('div');
+            div.className = 'input-group mb-2';
+            div.innerHTML = `
+                <div class="input-group-text">
+                    <input class="form-check-input mt-0" type="radio" name="correctOption" value="${idx}">
+                </div>
+                <input type="text" class="form-control" name="optionText" placeholder="Option ${idx + 1}" required>
+                <button class="btn btn-outline-danger" type="button" onclick="this.parentElement.remove()"><i class="bi bi-x"></i></button>
+            `;
+            list.appendChild(div);
+        }
+
+        // ... Question Saving Logic ...
+        function handleTypeChange() {
+            const type = document.getElementById('questionType').value;
+            const container = document.getElementById('optionsContainer');
+            const list = document.getElementById('optionsList');
+            const btnAdd = document.getElementById('btnAddOption');
+
+            if (type === 'multiple_choice') {
+                container.classList.remove('d-none');
+                btnAdd.disabled = false;
+                btnAdd.classList.remove('d-none');
+                list.innerHTML = '';
+                addOption(); addOption();
+            } else if (type === 'true_false') {
+                container.classList.remove('d-none');
+                btnAdd.disabled = true;
+                btnAdd.classList.add('d-none');
+                list.innerHTML = '';
+
+                // Add True Option
+                const divTrue = document.createElement('div');
+                divTrue.className = 'input-group mb-2';
+                divTrue.innerHTML = `
+                    <div class="input-group-text">
+                        <input class="form-check-input mt-0" type="radio" name="correctOption" value="0">
+                    </div>
+                    <input type="text" class="form-control" name="optionText" value="True" readonly>
+                `;
+                list.appendChild(divTrue);
+
+                // Add False Option
+                const divFalse = document.createElement('div');
+                divFalse.className = 'input-group mb-2';
+                divFalse.innerHTML = `
+                    <div class="input-group-text">
+                        <input class="form-check-input mt-0" type="radio" name="correctOption" value="1">
+                    </div>
+                    <input type="text" class="form-control" name="optionText" value="False" readonly>
+                `;
+                list.appendChild(divFalse);
+            }
+        }
+
+        function addToQueue() {
+            // Get form data
+            const text = document.getElementById('questionText').value;
+            const type = document.getElementById('questionType').value;
+            const points = parseFloat(document.getElementById('questionPoints').value) || 1;
+            const explanation = document.getElementById('questionExplanation').value;
+
+            if (!text) {
+                utils.showAlert('Please enter question text', 'warning');
+                return;
+            }
+
+            // Get options
+            let options = [];
+            const optionGroups = document.getElementById('optionsList').querySelectorAll('.input-group');
+            optionGroups.forEach(group => {
+                const txt = group.querySelector('input[name="optionText"]').value;
+                const isCorrect = group.querySelector('input[name="correctOption"]').checked;
+                if (txt) options.push({ option_text: txt, is_correct: isCorrect });
+            });
+
+            // Validation
+            const correctCount = options.filter(o => o.is_correct).length;
+            if (options.length < 2) {
+                utils.showAlert('Questions need at least 2 options', 'warning');
+                return;
+            }
+            if (correctCount === 0) {
+                utils.showAlert('Please select a correct answer', 'warning');
+                return;
+            }
+
+            const tempId = 'temp_' + Date.now();
+            const questionData = {
+                temp_id: tempId,
+                question_text: text,
+                question_type: type,
+                points: points,
+                explanation: explanation,
+                options: options,
+                category_id: null // Can add category selection to form if needed
+            };
+
+            queuedQuestions.push(questionData);
+            updateQueueUI();
+
+            // Reset form for next question
+            document.getElementById('questionText').value = '';
+            document.getElementById('questionExplanation').value = '';
+
+            // Re-trigger type change to reset options correctly
+            handleTypeChange();
+
+            utils.showAlert('Question added to queue. Add more or Save All.', 'success');
+        }
+
+        function updateQueueUI() {
+            const container = document.getElementById('queuedQuestionsContainer');
+            const list = document.getElementById('queuedQuestionsList');
+            const countSpan = document.getElementById('queueCount');
+            const saveCountSpan = document.getElementById('saveAllCount');
+
+            countSpan.textContent = queuedQuestions.length;
+            saveCountSpan.textContent = queuedQuestions.length;
+
+            if (queuedQuestions.length > 0) {
+                container.classList.remove('d-none');
+                list.innerHTML = queuedQuestions.map((q, idx) => `
+                    <li>
+                        <div class="d-flex justify-content-between align-items-center border-bottom py-1">
+                            <span>
+                                <strong>${idx + 1}.</strong> ${q.question_text.substring(0, 30)}... 
+                                <span class="badge bg-light text-dark border ms-1">${q.question_type}</span>
+                            </span>
+                            <button type="button" class="btn btn-sm btn-link text-danger p-0" onclick="removeFromQueue('${q.temp_id}')">
+                                <i class="bi bi-x-circle"></i>
+                            </button>
+                        </div>
+                    </li>
+                `).join('');
+            } else {
+                container.classList.add('d-none');
+            }
+        }
+
+        function removeFromQueue(tempId) {
+            queuedQuestions = queuedQuestions.filter(q => q.temp_id !== tempId);
+            updateQueueUI();
+        }
+
+        function clearQueue() {
+            queuedQuestions = [];
+            updateQueueUI();
+        }
+
+        async function saveAllQueuedQuestions() {
+            if (queuedQuestions.length === 0) return;
+
+            const btn = document.querySelector('button[onclick="saveAllQueuedQuestions()"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Saving...';
+            btn.disabled = true;
+
+            let savedCount = 0;
+            let errors = 0;
+
+            for (const q of queuedQuestions) {
+                try {
+                    // Prepare Options with Order to avoid IntegrityError (unique_together order + question)
+                    let optionsPayload = [];
+                    if (q.options && q.options.length > 0) {
+                        optionsPayload = q.options.map((opt, idx) => ({
+                            option_text: opt.option_text,
+                            is_correct: opt.is_correct,
+                            order: idx + 1
+                        }));
+                    }
+
+                    // 1. Create Question with Options Nested
+                    const qData = {
+                        question_text: q.question_text,
+                        question_type: q.question_type,
+                        points: q.points,
+                        explanation: q.explanation,
+                        category: q.category_id || null, // Ensure null if empty
+                        is_active: true,
+                        options: optionsPayload // Send options directly here
+                    };
+
+                    const savedQ = await API.questions.create(qData);
+
+                    // Add to selected map so it appears in the exam immediately
+                    selectedQuestionsMap.set(savedQ.id, savedQ);
+                    savedCount++;
+
+                } catch (e) {
+                    console.error('Error saving question:', e);
+                    errors++;
+                }
+            }
+
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+
+            if (savedCount > 0) {
+                utils.showAlert(`Successfully saved ${savedCount} questions!`, 'success');
+                queuedQuestions = []; // Clear processed
+                updateQueueUI();
+                renderSelectedQuestionsTable(); // Update the main table
+                showManageQuestions(); // Go back to list
+            }
+
+            if (errors > 0) {
+                utils.showAlert(`Failed to save ${errors} questions. Check console for details.`, 'warning');
+            }
+        }
+
+        function updateReviewStep() {
+            document.getElementById('reviewTitle').textContent = document.getElementById('examTitle').value;
+            document.getElementById('reviewDescription').textContent = document.getElementById('examDescription').value || 'No description';
+            document.getElementById('reviewDuration').textContent = document.getElementById('examDuration').value;
+            document.getElementById('reviewPassing').textContent = document.getElementById('examPassingScore').value;
+            document.getElementById('reviewQuestionCount').textContent = selectedQuestionsMap.size;
+            let total = 0; selectedQuestionsMap.forEach(q => total += parseFloat(q.points));
+            document.getElementById('reviewTotalPoints').textContent = total;
+
+            // Badge updates
+            const setBadge = (id, checked) => {
+                const el = document.getElementById(id);
+                if (checked) { el.classList.remove('bg-light', 'text-dark'); el.classList.add('bg-primary', 'text-white'); }
+                else { el.classList.add('bg-light', 'text-dark'); el.classList.remove('bg-primary', 'text-white'); }
+            };
+            setBadge('badgeRandomQ', document.getElementById('examRandomizeQuestions').checked);
+            setBadge('badgeRandomO', document.getElementById('examRandomizeOptions').checked);
+            setBadge('badgeRetake', document.getElementById('examAllowRetake').checked);
+        }
+
+        async function saveExam() {
+            const examId = document.getElementById('examId').value;
+            const data = {
+                title: document.getElementById('examTitle').value,
+                description: document.getElementById('examDescription').value,
+                duration_minutes: parseInt(document.getElementById('examDuration').value),
+                passing_score: parseInt(document.getElementById('examPassingScore').value),
+                is_active: document.getElementById('examIsActive').checked,
+                randomize_questions: document.getElementById('examRandomizeQuestions').checked,
+                randomize_options: document.getElementById('examRandomizeOptions').checked,
+                allow_retake: document.getElementById('examAllowRetake').checked,
+                show_results_immediately: document.getElementById('examShowResults').checked,
+                question_ids: Array.from(selectedQuestionsMap.keys())
+            };
+
+            try {
+                if (examId) {
+                    await API.exams.update(examId, data);
+                    utils.showAlert('Exam updated successfully!', 'success');
+                } else {
+                    await API.exams.create(data);
+                    utils.showAlert('Exam created successfully!', 'success');
+                }
+                examModal.hide();
+                loadExams();
+            } catch (error) {
+                console.error(error);
+                utils.showAlert('Error saving exam: ' + (error.message || 'Unknown error'), 'danger');
+            }
+        }
+
+        async function editExam(id) {
+            try {
+                // Fetch full exam details including questions
+                const exam = await API.exams.get(id);
+                if (!exam) return;
+
+                document.getElementById('modalTitle').textContent = 'Edit Exam';
+                document.getElementById('saveBtn').textContent = 'Update Exam';
+                document.getElementById('saveBtn').onclick = () => saveExam(); // Ensure correct binding
+                document.getElementById('examId').value = exam.id;
+                document.getElementById('examTitle').value = exam.title;
+                document.getElementById('examDescription').value = exam.description;
+                document.getElementById('examDuration').value = exam.duration_minutes;
+                document.getElementById('examPassingScore').value = exam.passing_score;
+                document.getElementById('examIsActive').checked = exam.is_active;
+
+                // Toggle checkboxes
+                document.getElementById('examRandomizeQuestions').checked = exam.randomize_questions;
+                document.getElementById('examRandomizeOptions').checked = exam.randomize_options;
+                document.getElementById('examAllowRetake').checked = exam.allow_retake;
+                document.getElementById('examShowResults').checked = exam.show_results_immediately;
+
+                // Clear and populate questions
+                selectedQuestionsMap.clear();
+                if (exam.exam_questions && Array.isArray(exam.exam_questions)) {
+                    exam.exam_questions.forEach(eq => {
+                        // Backend returns nested question object in 'question' field
+                        if (eq.question) {
+                            selectedQuestionsMap.set(eq.question.id, eq.question);
+                        }
+                    });
+                }
+                renderSelectedQuestionsTable();
+
+                goToStep(1);
+                examModal.show();
+            } catch (error) {
+                console.error('Error fetching exam details:', error);
+                utils.showAlert('Error loading exam details: ' + (error.message || 'Unknown error'), 'danger');
+            }
+        }
+
+        async function deleteExam(id) {
+            if (!confirm('Are you sure you want to delete this exam? This action cannot be undone.')) return;
+            try {
+                await API.exams.delete(id);
+                await loadExams(); // Reload list
+                utils.showAlert('Exam deleted successfully.', 'success');
+            } catch (e) {
+                console.error(e);
+                // Check if it's a conflict (e.g., has results) or permission issue
+                let msg = 'Error deleting exam.';
+                if (e.data && e.data.detail) msg += ' ' + e.data.detail;
+                else if (e.message) msg += ' ' + e.message;
+
+                utils.showAlert(msg, 'danger');
+            }
+        }
+
+        window.toggleQuestionFromBank = toggleQuestionFromBank;
+    </script>
+</body>
+
+</html>

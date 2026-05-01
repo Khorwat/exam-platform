@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management | IT College</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons & Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --font-heading: 'Plus Jakarta Sans', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --sidebar-width: 280px;
+            --sidebar-bg: #0f172a;
+            --accent-primary: #6366f1;
+            --bg-light: #f8fafc;
+            --text-dark: #1e293b;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-light);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            color: #94a3b8;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 1000;
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+
+        .brand-section {
+            padding: 0 0.75rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: white;
+            font-family: var(--font-heading);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-icon {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            /* Admin Gold Context */
+        }
+
+        .nav-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .nav-item-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            color: #94a3b8;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .nav-item-link:hover,
+        .nav-item-link.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-item-link.active {
+            background: var(--accent-primary);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            color: #fff;
+        }
+
+        /* Custom Hover Colors */
+        .nav-link-admin:hover,
+        .nav-link-admin.active {
+            background: rgba(245, 158, 11, 0.15) !important;
+            color: #f59e0b !important;
+        }
+
+        .nav-link-academic:hover,
+        .nav-link-academic.active {
+            background: rgba(56, 189, 248, 0.15) !important;
+            color: #38bdf8 !important;
+            /* Sky Blue */
+        }
+
+        .nav-command {
+            background: linear-gradient(45deg, #ef4444, #b91c1c);
+            color: white !important;
+            margin-top: 2rem;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 2rem;
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        /* Stats */
+        .stat-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+            height: 100%;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            font-family: var(--font-heading);
+            color: var(--text-dark);
+        }
+
+        /* Table Card */
+        .table-card {
+            background: white;
+            border-radius: 1rem;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .role-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.35em 0.85em;
+            border-radius: 50px;
+            text-transform: uppercase;
+        }
+
+        .role-student {
+            background-color: #e0f2fe;
+            color: #0284c7;
+        }
+
+        .role-instructor {
+            background-color: #f3e8ff;
+            color: #9333ea;
+        }
+
+        .role-administrator {
+            background-color: #1e293b;
+            color: #f8fafc;
+        }
+
+        /* Toggle Switch Customization */
+        .form-check-input.status-toggle {
+            cursor: pointer;
+            width: 2.5em;
+            height: 1.25em;
+        }
+
+        .form-check-input.status-toggle:checked {
+            background-color: #10b981;
+            border-color: #10b981;
+        }
+
+        @media (max-width: 991px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .mobile-toggle {
+                display: block !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="brand-section">
+            <div class="brand-icon rounded p-1">
+                <i class="bi bi-mortarboard-fill fs-4 text-white"></i>
+            </div>
+            <span>IT College<br><small class="fw-normal opacity-75" style="font-size: 0.7rem">System
+                    Administration</small></span>
+        </div>
+
+        <div class="nav-section flex-grow-1 overflow-y-auto"
+            style="scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.2) transparent;">
+            <div class="d-flex flex-column gap-1">
+                <small class="text-uppercase fw-bold px-3 mb-2 mt-2 text-muted"
+                    style="font-size: 0.7rem; letter-spacing: 1px;">Administration</small>
+                <a href="/frontend/admin.html" class="nav-item-link nav-link-admin">
+                    <i class="bi bi-grid-1x2-fill"></i> Dashboard
+                </a>
+
+                <!-- Admin Only Section -->
+                <div class="admin-only">
+                    <a href="/frontend/admin-users.html" class="nav-item-link active nav-link-admin">
+                        <i class="bi bi-people-fill"></i> Users
+                    </a>
+                    <a href="/frontend/admin-announcements.html" class="nav-item-link nav-link-admin">
+                        <i class="bi bi-megaphone-fill"></i> Announcements
+                    </a>
+                    <a href="/frontend/admin-logs.html" class="nav-item-link nav-link-admin">
+                        <i class="bi bi-shield-lock-fill"></i> Logs
+                    </a>
+                    <a href="/frontend/admin-settings.html" class="nav-item-link nav-link-admin">
+                        <i class="bi bi-gear-fill"></i> Settings
+                    </a>
+                </div>
+
+                <small class="text-uppercase fw-bold px-3 mb-2 mt-3 text-info"
+                    style="font-size: 0.7rem; letter-spacing: 1px;">Academic</small>
+                <a href="/frontend/admin-exams.html" class="nav-item-link nav-link-academic">
+                    <i class="bi bi-file-earmark-text text-info"></i> Exams
+                </a>
+                <a href="/frontend/admin-questions.html" class="nav-item-link nav-link-academic">
+                    <i class="bi bi-hdd-stack-fill text-info"></i> Question Bank
+                </a>
+                <a href="/frontend/admin-analytics.html" class="nav-item-link nav-link-academic">
+                    <i class="bi bi-bar-chart-fill text-info"></i> Analytics
+                </a>
+                <a href="/frontend/grading.html" class="nav-item-link nav-link-academic">
+                    <i class="bi bi-check-circle text-info"></i> Grading
+                </a>
+                <a href="/frontend/admin-monitor.html" class="nav-item-link nav-link-academic"
+                    style="color: #ef4444 !important;">
+                    <i class="bi bi-camera-video-fill" style="color: #ef4444 !important;"></i> Live Command
+                </a>
+            </div>
+        </div>
+
+        <div class="mt-auto pt-3 border-top border-secondary border-opacity-25">
+            <a href="#" onclick="window.utils ? window.utils.logout() : window.location.href='/frontend/login.html'"
+                class="nav-item-link text-danger">
+                <i class="bi bi-box-arrow-left"></i> Sign Out
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Mobile Toggle -->
+        <button class="btn btn-dark d-lg-none mb-3 mobile-toggle" style="display:none">
+            <i class="bi bi-list"></i> Menu
+        </button>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 fw-bold text-dark font-heading mb-0">User Management</h1>
+                <p class="text-muted mb-0">Manage system access and roles</p>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-outline-secondary rounded-pill px-4"
+                    onclick="document.getElementById('importInput').click()">
+                    <i class="bi bi-upload me-2"></i> Import
+                </button>
+                <input type="file" id="importInput" class="d-none" accept=".csv" onchange="handleImport(this)">
+
+                <button class="btn btn-primary rounded-pill px-4" onclick="openUserModal()">
+                    <i class="bi bi-person-plus-fill me-2"></i> Add User
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-label">Total Users</div>
+                    <div class="stat-value text-primary" id="statTotalUsers">-</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-label">Students</div>
+                    <div class="stat-value text-info" id="statStudents">-</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-label">Instructors</div>
+                    <div class="stat-value text-purple" id="statInstructors" style="color: #9333ea;">-</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-label">Admins</div>
+                    <div class="stat-value text-dark" id="statAdmins">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Card -->
+        <div class="table-card">
+            <!-- Tabs -->
+            <div class="border-bottom px-4 pt-3 bg-light">
+                <ul class="nav nav-tabs border-0" id="roleTabs" style="margin-bottom: -1px;">
+                    <li class="nav-item">
+                        <a class="nav-link active px-3 pb-3 text-secondary"
+                            style="border-radius: 0; border: none; font-weight: 500;" href="#" data-role="all">All
+                            Users</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3 pb-3 text-secondary"
+                            style="border-radius: 0; border: none; font-weight: 500;" href="#"
+                            data-role="student">Students</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3 pb-3 text-secondary"
+                            style="border-radius: 0; border: none; font-weight: 500;" href="#"
+                            data-role="instructor">Instructors</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3 pb-3 text-secondary"
+                            style="border-radius: 0; border: none; font-weight: 500;" href="#"
+                            data-role="administrator">Admins</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Toolbar -->
+            <div class="p-4 border-bottom bg-white d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <!-- Bulk Actions -->
+                <div class="d-flex align-items-center gap-2" id="bulk-actions"
+                    style="opacity: 0.5; pointer-events: none;">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-dark btn-sm rounded-pill px-3 dropdown-toggle" type="button"
+                            data-bs-toggle="dropdown" id="bulkActionsBtn">
+                            Bulk Actions (<span id="selected-count">0</span>)
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item text-danger" href="#" onclick="bulkDelete()"><i
+                                        class="bi bi-trash me-2"></i> Delete Selected</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="bulkToggleStatus(false)"><i
+                                        class="bi bi-pause-circle me-2"></i> Deactivate Selected</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="bulkToggleStatus(true)"><i
+                                        class="bi bi-play-circle me-2"></i> Activate Selected</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 flex-grow-1 justify-content-end">
+                    <div class="position-relative" style="max-width: 300px; width: 100%;">
+                        <i
+                            class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-secondary"></i>
+                        <input type="text" class="form-control ps-5 rounded-pill border-secondary border-opacity-25"
+                            placeholder="Search users..." id="userSearch" onkeyup="filterUsers()">
+                    </div>
+                    <button class="btn btn-outline-success btn-sm rounded-pill px-3" onclick="exportUsers()">
+                        <i class="bi bi-download me-1"></i> Export CSV
+                    </button>
+                </div>
+                <div class="dropdown">
+                    <a href="#" class="text-decoration-none d-flex align-items-center gap-2" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        <div class="user-profile">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
+                                style="width: 32px; height: 32px; overflow: hidden;">
+                                <img id="header-avatar" src="" class="w-100 h-100 d-none" style="object-fit:cover;">
+                                <i class="bi bi-person-fill" id="header-icon"></i>
+                            </div>
+                            <div>
+                                <span class="d-block fw-bold text-dark small" id="user-name">User</span>
+                            </div>
+                        </div>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2">
+                        <li><a class="dropdown-item py-2" href="/frontend/profile.html"><i
+                                    class="bi bi-person me-2"></i>My Profile</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item py-2 text-danger" href="#"
+                                onclick="window.utils ? window.utils.logout() : window.location.href='/frontend/login.html'"><i
+                                    class="bi bi-box-arrow-right me-2"></i>Sign Out</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="bg-light text-secondary">
+                        <tr>
+                            <th class="ps-4 py-3" style="width: 40px;">
+                                <input class="form-check-input" type="checkbox" id="selectAll"
+                                    onclick="toggleSelectAll()">
+                            </th>
+                            <th class="py-3 fw-bold small text-uppercase">User</th>
+                            <th class="py-3 fw-bold small text-uppercase">Role</th>
+                            <th class="py-3 fw-bold small text-uppercase">Contact</th>
+                            <th class="py-3 fw-bold small text-uppercase text-center">Status</th>
+                            <th class="py-3 fw-bold small text-uppercase">Last Login</th>
+                            <th class="pe-4 py-3 fw-bold small text-uppercase text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody">
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">Loading users...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Controls -->
+            <div class="p-3 border-top bg-light d-flex justify-content-between align-items-center">
+                <span id="showingCount" class="text-muted small">Showing 0-0 of 0</span>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0 gap-1" id="paginationControls">
+                        <!-- Pagination injected via JS -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </main>
+
+    <!-- Create/Edit User Modal (Status Checkbox Removed) -->
+    <div class="modal fade" id="userModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header border-bottom">
+                    <h5 class="modal-title fw-bold" id="modalTitle">Add New User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="userForm">
+                        <input type="hidden" id="userId">
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-uppercase">Username</label>
+                                <input type="text" class="form-control" id="formUsername" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-uppercase">Email</label>
+                                <input type="email" class="form-control" id="formEmail" required>
+                            </div>
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-uppercase">First Name</label>
+                                <input type="text" class="form-control" id="formFirstName">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-uppercase">Last Name</label>
+                                <input type="text" class="form-control" id="formLastName">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-uppercase">Role</label>
+                            <select class="form-select" id="formRole" required>
+                                <option value="student">Student</option>
+                                <option value="instructor">Instructor</option>
+                                <option value="administrator">Administrator</option>
+                            </select>
+                        </div>
+                        <div class="row g-3 mb-3 d-none" id="studentFields">
+                            <div class="col-12">
+                                <div class="alert alert-info py-2 small mb-0"><i class="bi bi-info-circle me-1"></i>
+                                    Student ID is recommended but optional.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-uppercase">Student ID</label>
+                                <input type="text" class="form-control" id="formStudentId">
+                            </div>
+                        </div>
+                        <div class="mb-3 p-3 border rounded bg-light">
+                            <label class="form-label fw-bold small text-uppercase">Password</label>
+                            <input type="password" class="form-control" id="formPassword" placeholder="New Password">
+                            <div class="form-text mt-2"><i class="bi bi-lock me-1"></i> Required for new users. Leave
+                                blank to keep current.</div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <button type="button" class="btn btn-outline-secondary"
+                                data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary px-4 fw-bold">Save User</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Logic -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/api.js?v=2"></script>
+    <script src="/static/js/app.js"></script>
+    <script>
+        let allUsers = [];
+        let currentRoleFilter = 'all';
+        let userModal;
+
+        let selectedUsers = new Set();
+
+        // Paginaton State
+        let currentPage = 1;
+        const itemsPerPage = 10;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Auth User Name Check
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            if (user.role === 'administrator' || user.is_staff) document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('d-none'));
+
+            if (!utils.requireAuth()) return;
+
+            userModal = new bootstrap.Modal(document.getElementById('userModal'));
+
+            initTabs();
+            await loadUsers();
+
+            // Mobile toggle
+            document.querySelector('.mobile-toggle').addEventListener('click', () => { document.querySelector('.sidebar').style.transform = 'translateX(0)'; });
+            document.addEventListener('click', (e) => { if (window.innerWidth < 992 && !e.target.closest('.sidebar') && !e.target.closest('.mobile-toggle')) document.querySelector('.sidebar').style.transform = 'translateX(-100%)'; });
+        });
+
+        function initTabs() {
+            document.querySelectorAll('#roleTabs .nav-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    document.querySelectorAll('#roleTabs .nav-link').forEach(l => {
+                        l.classList.remove('active', 'text-primary');
+                        l.classList.add('text-secondary');
+                        l.style.borderBottom = "none";
+                    });
+                    e.target.classList.add('active', 'text-primary');
+                    e.target.classList.remove('text-secondary');
+                    e.target.style.borderBottom = "2px solid #f59e0b"; // Gold for admin
+
+                    currentRoleFilter = e.target.dataset.role;
+                    currentPage = 1; // Reset page on filter change
+                    renderUsers();
+                });
+            });
+
+            document.getElementById('formRole').addEventListener('change', (e) => {
+                const isStudent = e.target.value === 'student';
+                const el = document.getElementById('studentFields');
+                if (isStudent) el.classList.remove('d-none');
+                else el.classList.add('d-none');
+            });
+
+            document.getElementById('userForm').addEventListener('submit', handleUserSubmit);
+        }
+
+        async function loadUsers() {
+            try {
+                const response = await API.users.list();
+                allUsers = response.results || response;
+                updateStats();
+                renderUsers();
+            } catch (error) {
+                console.error(error);
+                utils.showAlert('Error loading users.', 'danger');
+            }
+        }
+
+        function updateStats() {
+            const stats = {
+                total: allUsers.length,
+                students: allUsers.filter(u => u.role === 'student').length,
+                instructors: allUsers.filter(u => u.role === 'instructor').length,
+                admins: allUsers.filter(u => u.role === 'administrator').length
+            };
+            document.getElementById('statTotalUsers').textContent = stats.total;
+            document.getElementById('statStudents').textContent = stats.students;
+            document.getElementById('statInstructors').textContent = stats.instructors;
+            document.getElementById('statAdmins').textContent = stats.admins;
+        }
+
+        function filterUsers() {
+            currentPage = 1;
+            renderUsers();
+        }
+
+        function renderUsers() {
+            const tbody = document.getElementById('userTableBody');
+            const search = document.getElementById('userSearch').value.toLowerCase();
+            let filtered = allUsers;
+
+            if (currentRoleFilter !== 'all') {
+                filtered = filtered.filter(u => u.role === currentRoleFilter);
+            }
+
+            if (search) {
+                filtered = filtered.filter(u =>
+                    u.username.toLowerCase().includes(search) ||
+                    u.email.toLowerCase().includes(search) ||
+                    (u.first_name + ' ' + u.last_name).toLowerCase().includes(search) ||
+                    (u.student_id && u.student_id.toLowerCase().includes(search))
+                );
+            }
+
+            // --- Pagination Logic ---
+            const totalItems = filtered.length;
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+            if (currentPage > totalPages) currentPage = totalPages || 1;
+
+            const startIdx = (currentPage - 1) * itemsPerPage;
+            const endIdx = startIdx + itemsPerPage;
+            const paginatedUsers = filtered.slice(startIdx, endIdx);
+
+            document.getElementById('showingCount').textContent = `Showing ${filtered.length > 0 ? startIdx + 1 : 0}-${Math.min(endIdx, totalItems)} of ${totalItems}`;
+
+            updateBulkActions();
+            renderPagination(totalPages);
+
+            if (paginatedUsers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-5 text-muted">No users found.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = paginatedUsers.map(u => {
+                const initials = (u.username.substring(0, 2)).toUpperCase();
+                const fullName = (u.first_name || u.last_name) ? `${u.first_name} ${u.last_name}` : u.username;
+                const date = new Date(u.created_at).toLocaleDateString();
+                const lastLogin = u.last_login ? new Date(u.last_login).toLocaleString() : '<span class="text-muted small">Never</span>';
+
+                return `
+                <tr class="${selectedUsers.has(u.id) ? 'table-active' : ''}">
+                    <td class="ps-4">
+                        <input class="form-check-input user-checkbox" type="checkbox" value="${u.id}" 
+                            ${selectedUsers.has(u.id) ? 'checked' : ''} onclick="toggleUserSelection(${u.id})">
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="user-avatar shadow-sm me-3" style="background-color: ${getColorHash(u.username)}">
+                                ${initials}
+                            </div>
+                            <div>
+                                <div class="fw-bold text-dark">${fullName}</div>
+                                <div class="small text-muted">@${u.username}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="role-badge role-${u.role}">${u.role}</span></td>
+                    <td>
+                        <div class="small text-dark fw-medium">${u.email}</div>
+                    </td>
+                    <td class="text-center">
+                        <div class="form-check form-switch d-inline-block">
+                             <input class="form-check-input status-toggle" type="checkbox" role="switch" 
+                                ${u.is_active ? 'checked' : ''} 
+                                onchange="toggleUserStatus(${u.id}, this)">
+                        </div>
+                    </td>
+                     <td class="text-muted small">
+                        ${lastLogin}
+                    </td>
+                    <td class="pe-4 text-end">
+                         <div class="btn-group">
+                            <button class="btn btn-sm btn-outline-secondary border-0" onclick="editUser(${u.id})" title="Edit">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger border-0" onclick="deleteUser(${u.id})" title="Delete">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function renderPagination(totalPages) {
+            const nav = document.getElementById('paginationControls');
+            if (totalPages <= 1) { nav.innerHTML = ''; return; }
+
+            let html = `
+                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="changePage(${currentPage - 1})"><i class="bi bi-chevron-left"></i></a>
+                </li>
+             `;
+
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                    html += `<li class="page-item ${currentPage === i ? 'active' : ''}"><a class="page-link" href="#" onclick="changePage(${i})">${i}</a></li>`;
+                } else if (i === currentPage - 2 || i === currentPage + 2) {
+                    html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+                }
+            }
+
+            html += `
+                <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="changePage(${currentPage + 1})"><i class="bi bi-chevron-right"></i></a>
+                </li>
+             `;
+            nav.innerHTML = html;
+        }
+
+        function changePage(page) {
+            currentPage = page;
+            renderUsers();
+        }
+
+        // --- Status Toggle Logic ---
+        async function toggleUserStatus(id, checkbox) {
+            const newStatus = checkbox.checked;
+            try {
+                await API.users.update(id, { is_active: newStatus });
+                // Update local data
+                const user = allUsers.find(u => u.id === id);
+                if (user) user.is_active = newStatus;
+                utils.showAlert(`User ${newStatus ? 'activated' : 'deactivated'} successfully.`, 'success');
+            } catch (e) {
+                checkbox.checked = !newStatus; // Revert
+                console.error(e);
+                utils.showAlert('Failed to update status.', 'danger');
+            }
+        }
+
+        function toggleUserSelection(id) {
+            if (selectedUsers.has(id)) selectedUsers.delete(id);
+            else selectedUsers.add(id);
+            updateBulkActions();
+            renderUsers(); // Re-render to show active row state
+        }
+
+        function toggleSelectAll() {
+            const allChecked = document.getElementById('selectAll').checked;
+            selectedUsers.clear();
+            if (allChecked) {
+                // Determine current visible users to select
+                const search = document.getElementById('userSearch').value.toLowerCase();
+                let filtered = allUsers;
+                if (currentRoleFilter !== 'all') filtered = filtered.filter(u => u.role === currentRoleFilter);
+                if (search) filtered = filtered.filter(u => u.username.includes(search) || u.email.includes(search));
+
+                filtered.forEach(u => selectedUsers.add(u.id));
+            }
+            updateBulkActions();
+            renderUsers(); // Highlight rows
+        }
+
+        function updateBulkActions() {
+            const count = selectedUsers.size;
+            document.getElementById('selected-count').textContent = count;
+            const bulkDiv = document.getElementById('bulk-actions');
+
+            if (count > 0) {
+                bulkDiv.style.opacity = '1';
+                bulkDiv.style.pointerEvents = 'auto';
+            } else {
+                bulkDiv.style.opacity = '0.5';
+                bulkDiv.style.pointerEvents = 'none';
+            }
+        }
+
+        // --- Bulk Actions ---
+        async function bulkToggleStatus(status) {
+            if (selectedUsers.size === 0) return;
+            if (!confirm(`Are you sure you want to ${status ? 'activate' : 'deactivate'} ${selectedUsers.size} users?`)) return;
+
+            document.getElementById('bulkActionsBtn').classList.add('disabled');
+            document.getElementById('bulkActionsBtn').textContent = 'Processing...';
+
+            let successCount = 0;
+            const ids = Array.from(selectedUsers);
+
+            for (const id of ids) {
+                try {
+                    await API.users.update(id, { is_active: status });
+                    const user = allUsers.find(u => u.id === id);
+                    if (user) user.is_active = status;
+                    successCount++;
+                } catch (e) { console.error('Bulk update failed for', id); }
+            }
+
+            utils.showAlert(`Updated ${successCount} users.`, 'success');
+            selectedUsers.clear();
+            renderUsers();
+            updateBulkActions();
+
+            document.getElementById('bulkActionsBtn').classList.remove('disabled');
+            document.getElementById('bulkActionsBtn').textContent = 'Bulk Actions (0)';
+        }
+
+        function exportUsers() {
+            let csvContent = "data:text/csv;charset=utf-8,ID,Username,Email,Role,FirstName,LastName,Joined,Status,LastLogin\n";
+
+            // Allow filtering for export
+            const search = document.getElementById('userSearch').value.toLowerCase();
+            let filtered = allUsers;
+            if (currentRoleFilter !== 'all') filtered = filtered.filter(u => u.role === currentRoleFilter);
+            if (search) filtered = filtered.filter(u => u.username.toLowerCase().includes(search) || u.email.toLowerCase().includes(search));
+
+            filtered.forEach(u => {
+                let row = [
+                    u.id, u.username, u.email, u.role, u.first_name || '', u.last_name || '',
+                    new Date(u.created_at).toLocaleDateString(), u.is_active ? 'Active' : 'Inactive',
+                    u.last_login ? new Date(u.last_login).toISOString() : 'Never'
+                ].map(i => `"${i}"`).join(",");
+                csvContent += row + "\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `users_export_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            utils.showAlert('Users exported successfully', 'success');
+        }
+
+        function handleImport(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                setTimeout(() => {
+                    utils.showAlert(`Mock Import: Analyzed ${file.name}. 25 users would be created.`, 'info');
+                    input.value = '';
+                }, 1000);
+            }
+        }
+
+        async function bulkDelete() {
+            if (!confirm(`Are you sure you want to delete ${selectedUsers.size} users?`)) return;
+
+            let successCount = 0;
+            const ids = Array.from(selectedUsers);
+
+            document.getElementById('bulkActionsBtn').classList.add('disabled');
+            document.getElementById('bulkActionsBtn').textContent = 'Deleting...';
+
+            for (const id of ids) {
+                try {
+                    await API.users.delete(id);
+                    // Update local list to avoid full reload
+                    allUsers = allUsers.filter(u => u.id !== id);
+                    successCount++;
+                } catch (e) {
+                    console.error('Failed to delete user', id, e);
+                }
+            }
+
+            utils.showAlert(`Deleted ${successCount} users.`, 'success');
+            selectedUsers.clear();
+            renderUsers();
+            updateBulkActions();
+            updateStats();
+            document.getElementById('bulkActionsBtn').classList.remove('disabled');
+        }
+
+        function getColorHash(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+            const c = (hash & 0x00FFFFFF).toString(16).toUpperCase();
+            return '#' + "00000".substring(0, 6 - c.length) + c;
+        }
+
+
+
+        function openUserModal() {
+            document.getElementById('userForm').reset();
+            document.getElementById('userId').value = '';
+            document.getElementById('modalTitle').textContent = 'Add New User';
+            document.getElementById('studentFields').classList.add('d-none');
+            userModal.show();
+        }
+        async function editUser(id) {
+            const user = allUsers.find(u => u.id === id);
+            if (!user) return;
+            document.getElementById('userId').value = user.id;
+            document.getElementById('modalTitle').textContent = 'Edit User: ' + user.username;
+            document.getElementById('formUsername').value = user.username;
+            document.getElementById('formEmail').value = user.email;
+            document.getElementById('formFirstName').value = user.first_name || '';
+            document.getElementById('formLastName').value = user.last_name || '';
+            document.getElementById('formRole').value = user.role;
+            document.getElementById('formStudentId').value = user.student_id || '';
+
+            const evt = new Event('change');
+            document.getElementById('formRole').dispatchEvent(evt);
+
+            userModal.show();
+        }
+        async function handleUserSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('userId').value;
+            const data = {
+                username: document.getElementById('formUsername').value,
+                email: document.getElementById('formEmail').value,
+                first_name: document.getElementById('formFirstName').value,
+                last_name: document.getElementById('formLastName').value,
+                role: document.getElementById('formRole').value,
+                student_id: document.getElementById('formStudentId').value || null,
+            };
+            if (!id) data.is_active = true;
+
+            const pass = document.getElementById('formPassword').value;
+            if (pass) data.password = pass;
+
+            try {
+                if (id) await API.users.update(id, data);
+                else {
+                    if (!pass && !id) { utils.showAlert('Password required.', 'warning'); return; }
+                    await API.users.create(data);
+                }
+                userModal.hide();
+                await loadUsers();
+                utils.showAlert('Saved.', 'success');
+            } catch (e) { console.error(e); utils.showAlert('Error saving.', 'danger'); }
+        }
+        async function deleteUser(id) {
+            if (!confirm('Delete this user?')) return;
+            try {
+                await API.users.delete(id);
+                allUsers = allUsers.filter(u => u.id !== id);
+                renderUsers();
+                updateStats();
+                utils.showAlert('User deleted.', 'success');
+            } catch (e) { console.error(e); utils.showAlert('Error deleting.', 'danger'); }
+        }
+
+        // Expose
+        window.changePage = changePage;
+        window.toggleUserStatus = toggleUserStatus;
+    </script>
+</body>
+
+</html>

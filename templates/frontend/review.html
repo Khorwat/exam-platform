@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Review - ExamPortal</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-dark: #4338CA;
+            --secondary: #64748B;
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --dark: #0F172A;
+            --light: #F8FAFC;
+            --surface: #FFFFFF;
+            --border: #E2E8F0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: #7e22ce !important;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .brand-icon {
+            background: linear-gradient(135deg, #a855f7, #7e22ce);
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Review Header */
+        .review-header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .score-badge {
+            font-size: 2rem;
+            font-weight: 700;
+            padding: 1rem 2rem;
+            border-radius: 1rem;
+            display: inline-block;
+        }
+
+        .bg-pass {
+            background: #DCFCE7;
+            color: #166534;
+        }
+
+        .bg-fail {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        /* Question Cards */
+        .question-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .question-status-bar {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+        }
+
+        .status-correct {
+            background-color: var(--success);
+        }
+
+        .status-wrong {
+            background-color: var(--danger);
+        }
+
+        .question-text {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--dark);
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .option-item {
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: var(--surface);
+        }
+
+        /* Review Styles */
+        .option-correct {
+            border-color: var(--success);
+            background-color: #F0FDF4;
+            /* Green-50 */
+            color: #166534;
+        }
+
+        .option-wrong {
+            border-color: var(--danger);
+            background-color: #FEF2F2;
+            /* Red-50 */
+            color: #991B1B;
+        }
+
+        .option-icon {
+            font-size: 1.25rem;
+        }
+
+        .badge-info-outline {
+            border: 1px solid var(--border);
+            color: var(--secondary);
+            font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.5rem;
+        }
+
+        .btn-back {
+            color: var(--secondary);
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            transition: color 0.2s;
+        }
+
+        .btn-back:hover {
+            color: var(--primary);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/frontend/index.html">
+                <div class="brand-icon rounded p-1 me-1">
+                    <i class="bi bi-mortarboard-fill text-white"></i>
+                </div>
+                <span>IT College<br><small class="fw-normal opacity-75"
+                        style="font-size: 0.6rem; display: block; line-height: 1;">Student Portal</small></span>
+            </a>
+            <div class="ms-auto">
+                <div class="user-dropdown dropdown">
+                    <button class="btn dropdown-toggle border-0" type="button" data-bs-toggle="dropdown">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="bg-primary-light text-primary rounded-circle d-flex align-items-center justify-content-center"
+                                style="width: 32px; height: 32px; background: #EEF2FF; color: #4F46E5;">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
+                            <span class="fw-medium small" id="username">Student</span>
+                        </div>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 p-2"
+                        style="border-radius: 12px; min-width: 200px;">
+                        <li><a class="dropdown-item rounded py-2" href="/frontend/profile.html"><i
+                                    class="bi bi-person me-2"></i> My Profile</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item rounded py-2 text-danger" href="javascript:void(0)"
+                                onclick="utils.logout()"><i class="bi bi-box-arrow-right me-2"></i> Sign Out</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div id="alert-container" class="container mt-3"></div>
+
+    <!-- Review Header -->
+    <div class="review-header">
+        <div class="container">
+            <a href="/frontend/results.html" class="btn-back"><i class="bi bi-arrow-left"></i> Back to Results</a>
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h5 class="text-uppercase text-secondary fw-bold small mb-2">Exam Review</h5>
+                    <h1 class="fw-bold mb-2" id="exam-title">Loading...</h1>
+                    <div class="d-flex gap-3 text-secondary">
+                        <span id="exam-date"><i class="bi bi-calendar3 me-1"></i> -</span>
+                        <span id="exam-instructor"><i class="bi bi-person-badge me-1"></i> -</span>
+                    </div>
+                </div>
+                <div class="col-md-4 text-md-end mt-4 mt-md-0">
+                    <div id="score-badge" class="score-badge">
+                        <span id="score-value">-</span>%
+                    </div>
+                    <div class="mt-2 text-secondary fw-medium" id="score-text">-</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Questions Container -->
+    <main class="container pb-5">
+        <div id="questions-container">
+            <!-- Skeleton Loader -->
+            <div class="question-card">
+                <div class="placeholder-glow">
+                    <span class="placeholder col-7 mb-3"></span>
+                    <span class="placeholder col-4"></span>
+                    <div class="mt-4">
+                        <span class="placeholder col-12 mb-2 p-3 d-block"></span>
+                        <span class="placeholder col-12 mb-2 p-3 d-block"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!utils.isAuthenticated()) {
+                window.location.href = '/frontend/login.html';
+                return;
+            }
+
+            // Set username
+            const user = utils.getCurrentUser();
+            if (user) {
+                document.getElementById('username').textContent = user.username || 'Student';
+            }
+
+            // Get Result ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const resultId = urlParams.get('id');
+
+            if (!resultId) {
+                utils.showAlert('No result ID provided.', 'danger');
+                return;
+            }
+
+            try {
+                const result = await API.request(`/results/${resultId}/`);
+
+                renderHeader(result);
+                renderQuestions(result.session.answers);
+
+            } catch (error) {
+                console.error('Error loading review:', error);
+                utils.showAlert('Failed to load exam review.', 'danger');
+            }
+        });
+
+        function renderHeader(result) {
+            document.getElementById('exam-title').textContent = result.session.exam.title;
+
+            const date = new Date(result.graded_at || result.created_at);
+            document.getElementById('exam-date').innerHTML = `<i class="bi bi-calendar3 me-1"></i> ${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+
+            // Try to find instructor name if available, otherwise hide
+            if (result.session.exam.created_by_name) {
+                document.getElementById('exam-instructor').innerHTML = `<i class="bi bi-person-badge me-1"></i> ${result.session.exam.created_by_name}`;
+            }
+
+            const score = result.percentage_score;
+            const passed = result.passed;
+            const badge = document.getElementById('score-badge');
+
+            document.getElementById('score-value').textContent = score;
+            badge.classList.add(passed ? 'bg-pass' : 'bg-fail');
+
+            document.getElementById('score-text').textContent = passed ? 'Passed' : 'Failed - Keep Trying';
+        }
+
+        function renderQuestions(answers) {
+            const container = document.getElementById('questions-container');
+            container.innerHTML = '';
+
+            if (!answers || answers.length === 0) {
+                container.innerHTML = '<div class="text-center text-muted py-5">No questions found for this exam session.</div>';
+                return;
+            }
+
+            answers.forEach((answer, index) => {
+                const q = answer.question;
+                const isUserCorrect = answer.is_correct;
+                const userSelectedId = answer.selected_option_id;
+
+                const card = document.createElement('div');
+                card.className = 'question-card';
+
+                // Status Bar (Left border color)
+                const statusBar = document.createElement('div');
+                statusBar.className = `question-status-bar ${isUserCorrect ? 'status-correct' : 'status-wrong'}`;
+                card.appendChild(statusBar);
+
+                // Header (Q Number + Points)
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'd-flex justify-content-between align-items-start mb-3';
+                headerDiv.innerHTML = `
+                    <div class="badge-info-outline">Question ${index + 1}</div>
+                    <div class="text-secondary small fw-medium">${answer.points_earned} / ${q.points} Points</div>
+                `;
+                card.appendChild(headerDiv);
+
+                // Question Text
+                const textDiv = document.createElement('div');
+                textDiv.className = 'question-text';
+                textDiv.textContent = q.question_text;
+                card.appendChild(textDiv);
+
+                // Options
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = 'options-list';
+
+                if (q.options && q.options.length > 0) {
+                    q.options.forEach(opt => {
+                        const isSelected = opt.id === userSelectedId;
+                        const isCorrect = opt.is_correct;
+
+                        let optionClass = 'option-item';
+                        let icon = '<i class="bi bi-circle option-icon text-secondary"></i>';
+
+                        if (isCorrect) {
+                            optionClass += ' option-correct';
+                            icon = '<i class="bi bi-check-circle-fill option-icon"></i>';
+                        } else if (isSelected && !isCorrect) {
+                            optionClass += ' option-wrong';
+                            icon = '<i class="bi bi-x-circle-fill option-icon"></i>';
+                        } else if (isSelected) {
+                            // Should be caught by isCorrect, but fallback
+                            optionClass += ' option-correct';
+                        } else {
+                            // Unselected, incorrect option
+                            icon = '<i class="bi bi-circle option-icon text-secondary" style="opacity: 0.5"></i>';
+                        }
+
+                        // Label to indicate user choice clearly
+                        let label = '';
+                        if (isSelected) {
+                            label = '<span class="ms-auto badge bg-secondary bg-opacity-10 text-secondary">Your Answer</span>';
+                        }
+                        if (isCorrect && !isSelected) {
+                            label = '<span class="ms-auto badge bg-success bg-opacity-10 text-success">Correct Answer</span>';
+                        }
+
+                        const optDiv = document.createElement('div');
+                        optDiv.className = optionClass;
+                        optDiv.innerHTML = `
+                            ${icon}
+                            <span>${opt.option_text}</span>
+                            ${label}
+                        `;
+                        optionsDiv.appendChild(optDiv);
+                    });
+                } else {
+                    // Fallback for unexpected state
+                    optionsDiv.innerHTML = `<div class="p-3 bg-light rounded text-muted text-center"><i class="bi bi-exclamation-circle me-2"></i>No options available for this question.</div>`;
+                }
+
+                card.appendChild(optionsDiv);
+                container.appendChild(card);
+            });
+        }
+    </script>
+</body>
+
+</html>

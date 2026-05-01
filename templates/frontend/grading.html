@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results Review - Online Examination Platform</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <!-- CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --font-heading: 'Plus Jakarta Sans', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --sidebar-width: 280px;
+            --sidebar-bg: #0f172a;
+            --accent-primary: #6366f1;
+            --accent-secondary: #818cf8;
+            --bg-light: #f8fafc;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+        }
+
+        /* Sidebar Styling (Matches Admin) */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            color: #94a3b8;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 1000;
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+
+        .brand-section {
+            padding: 0 0.75rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: white;
+            font-family: var(--font-heading);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-icon {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        }
+
+        .nav-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .nav-item-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            /* Clean rounded corners */
+            color: #94a3b8;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .nav-item-link:hover,
+        .nav-item-link.active {
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+        }
+
+        /* Active State Indicators (Like Admin) */
+
+        .nav-link-academic.active {
+            background: rgba(56, 189, 248, 0.15) !important;
+            color: #38bdf8 !important;
+            /* Sky blue for academic tools */
+            box-shadow: none;
+            /* Cleaner flat look */
+        }
+
+        /* Main Content Wrapper */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 0;
+            /* Full height for grading app */
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            width: calc(100% - var(--sidebar-width));
+            transition: margin-left 0.3s ease, width 0.3s ease;
+        }
+
+        /* Internal Layout - Student Queue & Workspace */
+        .queue-sidebar {
+            background: white;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .queue-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .search-input {
+            background-color: var(--bg-light);
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            background-color: white;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .student-item {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: background 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .student-item:hover {
+            background-color: #f8fafc;
+        }
+
+        .student-item.active {
+            background-color: #f1f5f9;
+            border-left-color: var(--accent-primary);
+        }
+
+        #alert-container {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 9999;
+            min-width: 300px;
+        }
+
+        /* Paper Sheet */
+        .paper-container {
+            background-color: #f1f5f9;
+            /* Slate 100 */
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        .paper-sheet {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            background: white;
+            border-radius: 1rem;
+            /* Softer corners */
+            margin-bottom: 3rem;
+        }
+
+        .question-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .question-card:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .student-answer-box {
+            background-color: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        /* Mobile */
+        @media (max-width: 991px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+        }
+    </style>
+    <script>
+        if (localStorage.getItem('user_role') === 'administrator') {
+            document.write('<style>.admin-only { display: block !important; }</style>');
+        }
+    </script>
+</head>
+
+<body>
+    <div id="alert-container"></div>
+    <!-- Main App Sidebar -->
+    <!-- Main App Sidebar -->
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="brand-section">
+            <div class="brand-icon rounded p-1">
+                <i class="bi bi-mortarboard-fill fs-4 text-white"></i>
+            </div>
+            <span>IT College<br><small class="fw-normal opacity-75" style="font-size: 0.7rem">Academic
+                    Management</small></span>
+        </div>
+
+        <div class="nav-section flex-grow-1 overflow-y-auto"
+            style="scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.2) transparent;">
+            <div class="d-flex flex-column gap-1">
+                <small class="text-uppercase fw-bold px-3 mb-2 mt-2 text-muted"
+                    style="font-size: 0.7rem; letter-spacing: 1px;">Administration</small>
+                <a href="/frontend/admin.html" class="nav-item-link nav-link-admin">
+                    <i class="bi bi-grid-1x2-fill"></i> Dashboard
+                </a>
+
+                <!-- Admin Only Section -->
+                <div class="admin-only d-none">
+                    <a href="/frontend/admin-users.html" class="nav-item-link nav-link-admin">
+                        <i class="bi bi-people-fill"></i> Users
+                    </a>
+                    <a href="/frontend/admin-announcements.html" class="nav-item-link nav-link-admin">
+                        <i class="bi bi-megaphone-fill"></i> Announcements
+                    </a>
+                    <a href="/frontend/admin-logs.html" class="nav-item-link nav-link-admin">
+                        <i class="bi bi-shield-lock-fill"></i> Logs
+                    </a>
+                    <a href="/frontend/admin-settings.html" class="nav-item-link nav-link-admin">
+                        <i class="bi bi-gear-fill"></i> Settings
+                    </a>
+                </div>
+
+                <small class="text-uppercase fw-bold px-3 mb-2 mt-3 text-info"
+                    style="font-size: 0.7rem; letter-spacing: 1px;">Academic</small>
+                <a href="/frontend/admin-exams.html" class="nav-item-link nav-link-academic">
+                    <i class="bi bi-file-earmark-text text-info"></i> Exams
+                </a>
+                <a href="/frontend/admin-questions.html" class="nav-item-link nav-link-academic">
+                    <i class="bi bi-hdd-stack-fill text-info"></i> Question Bank
+                </a>
+                <a href="/frontend/admin-analytics.html" class="nav-item-link nav-link-academic">
+                    <i class="bi bi-bar-chart-fill text-info"></i> Analytics
+                </a>
+                <a href="/frontend/grading.html" class="nav-item-link active nav-link-academic">
+                    <i class="bi bi-check-circle text-info"></i> Results Review
+                </a>
+                <a href="/frontend/admin-monitor.html" class="nav-item-link nav-link-academic"
+                    style="color: #ef4444 !important;">
+                    <i class="bi bi-camera-video-fill" style="color: #ef4444 !important;"></i> Live Command
+                </a>
+            </div>
+        </div>
+
+        <div class="mt-auto pt-3 border-top border-secondary border-opacity-25">
+            <a href="#" onclick="window.utils ? window.utils.logout() : window.logout()"
+                class="nav-item-link text-danger">
+                <i class="bi bi-box-arrow-left"></i> Sign Out
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <!-- Mobile Header Helper (visible only on mobile) -->
+        <div class="d-md-none bg-white border-bottom p-3 d-flex justify-content-between align-items-center">
+            <span class="fw-bold font-heading">Results Review</span>
+            <button class="btn btn-sm btn-light border" onclick="toggleAppSidebar()">
+                <i class="bi bi-list"></i>
+            </button>
+        </div>
+
+        <div id="alert-container" class="position-fixed top-0 end-0 p-3" style="z-index: 2000;"></div>
+
+        <div class="row g-0 h-100 position-relative">
+            <!-- Internal Student Filter Sidebar -->
+            <div class="col-md-3 border-end bg-white h-100 overflow-hidden d-flex flex-column transition-width shadow-sm position-relative z-10"
+                id="studentSidebar">
+                <div class="p-3 border-bottom bg-white">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0 text-uppercase text-secondary small fw-bold ls-wider"
+                            style="font-size: 0.75rem; letter-spacing: 0.05em;">Student Queue</h6>
+                        <button class="btn btn-sm btn-light text-secondary rounded-circle"
+                            onclick="toggleStudentSidebar()" title="Collapse Panel">
+                            <i class="bi bi-layout-sidebar-inset"></i>
+                        </button>
+                    </div>
+                    <div class="position-relative mb-2">
+                        <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                        <input type="text" class="form-control form-control-sm ps-5 rounded-pill bg-light border-0"
+                            id="searchStudent" placeholder="Search..." onkeyup="filterSessions()">
+                    </div>
+                    <select class="form-select form-select-sm border-0 bg-light rounded-pill ps-3" id="filterStatus"
+                        onchange="filterSessions()">
+                        <option value="all">All Sessions</option>
+                        <option value="submitted">Review Pending</option>
+                        <option value="graded">Reviewed</option>
+                    </select>
+                </div>
+                <div class="list-group list-group-flush flex-grow-1 overflow-auto custom-scrollbar" id="sessions-list">
+                    <div class="text-center p-5">
+                        <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                        <p class="small text-muted mt-2">Loading...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grading Workspace -->
+            <div class="col-md-9 h-100 overflow-hidden d-flex flex-column bg-light relative" id="mainGradingArea">
+                <!-- Empty State -->
+                <div id="emptyState"
+                    class="d-flex flex-column align-items-center justify-content-center h-100 text-muted p-5 text-center">
+                    <div class="bg-white p-4 rounded-circle shadow-sm mb-4">
+                        <i
+                            class="bi bi-mortarboard-fill fs-1 text-primary bg-primary bg-opacity-10 p-3 rounded-circle"></i>
+                    </div>
+                    <h4 class="fw-bold text-dark font-heading">Ready to Review?</h4>
+                    <p class="text-secondary" style="max-width: 300px;">Select a student from the list to view their
+                        exam results and make adjustments if needed.</p>
+                </div>
+
+                <!-- Grading Interface -->
+                <div id="gradingInterface" class="d-none h-100 d-flex flex-column">
+                    <!-- Sticky Header -->
+                    <div class="bg-white border-bottom px-4 py-2 d-flex justify-content-between align-items-center shadow-sm z-10"
+                        style="height: 64px;">
+                        <div>
+                            <h5 class="mb-0 fw-bold font-heading text-dark" id="headerStudentName">Student Name</h5>
+                            <small class="text-muted" id="headerExamTitle">Exam Title</small>
+                        </div>
+                        <div class="d-flex align-items-center gap-4">
+                            <div class="text-end">
+                                <div class="small text-uppercase text-muted fw-bold" style="font-size: 0.65rem;">Current
+                                    Score</div>
+                                <div class="fs-5 fw-bold text-primary font-heading" id="headerScore">0 / 0</div>
+                            </div>
+                            <div class="vr bg-secondary opacity-25"></div>
+                            <div class="text-end" style="min-width: 150px;">
+                                <div class="d-flex justify-content-between small text-muted mb-1">
+                                    <span>Progress</span>
+                                    <span id="progressText">0/0</span>
+                                </div>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar bg-success" id="progressBar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Scrollable Paper -->
+                    <div class="flex-grow-1 overflow-auto p-4 custom-scrollbar bg-slate-50" id="paperContainer"
+                        style="background-color: #f1f5f9;">
+                        <div class="paper-sheet mx-auto bg-white p-5 rounded-3"
+                            style="max-width: 850px; min-height: 100%;">
+                            <div id="questionsList"></div>
+                        </div>
+                    </div>
+
+                    <!-- Sticky Footer -->
+                    <div
+                        class="bg-white border-top px-4 py-3 shadow-lg d-flex justify-content-between align-items-center z-20">
+                        <div class="small text-muted d-flex align-items-center gap-2">
+                            <i class="bi bi-info-circle"></i>
+                            <span id="unsavedChangesInd"
+                                class="d-none text-warning fw-bold bg-warning bg-opacity-10 px-2 py-1 rounded">Unsaved
+                                Changes</span>
+                            <span class="d-none d-md-inline ms-2 text-secondary">| Ctrl+Enter to Submit</span>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-light border text-secondary fw-medium" onclick="loadNextSession()">
+                                Skip
+                            </button>
+                            <button class="btn btn-primary px-4 fw-bold shadow-sm"
+                                style="background-color: var(--accent-primary); border: none;"
+                                onclick="submitAllGrades()" id="submitBtn">
+                                <i class="bi bi-check-lg me-2"></i> Save Changes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn btn-white shadow border position-fixed bottom-0 start-0 m-3 d-none rounded-circle p-2"
+            id="expandSidebarBtn" onclick="toggleStudentSidebar()" style="width: 40px; height: 40px; z-index: 50;">
+            <i class="bi bi-layout-sidebar-inset"></i>
+        </button>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/app.js"></script>
+    <script>
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+        let currentSessionId = null;
+        let sessionsCache = [];
+        let draftGrades = {};
+        let hasUnsavedChanges = false;
+        let totalPointsPossible = 0;
+
+        function toggleAppSidebar() {
+            document.getElementById('appSidebar').classList.toggle('active');
+        }
+
+        async function loadSessions(examId = null) {
+            try {
+                const params = examId ? `?exam_id=${examId}` : '';
+                const sessions = await API.request(`/examinations/sessions/${params}`);
+                sessionsCache = sessions.results || sessions;
+                renderSessionsList(sessionsCache);
+            } catch (error) {
+                console.error('Error loading sessions:', error);
+                utils.showAlert('Error loading sessions: ' + error.message, 'danger');
+            }
+        }
+
+        function filterSessions() {
+            const query = document.getElementById('searchStudent').value.toLowerCase();
+            const status = document.getElementById('filterStatus').value;
+
+            const filtered = sessionsCache.filter(s => {
+                const matchesName = (s.student.username || '').toLowerCase().includes(query);
+                let matchesStatus = true;
+                if (status === 'submitted') {
+                    matchesStatus = s.status === 'submitted';
+                }
+                return matchesName && matchesStatus;
+            });
+
+            renderSessionsList(filtered);
+        }
+
+        function renderSessionsList(list) {
+            const listContainer = document.getElementById('sessions-list');
+            if (list.length === 0) {
+                listContainer.innerHTML = '<div class="p-4 text-muted text-center small">No matching sessions found.</div>';
+                return;
+            }
+
+            listContainer.innerHTML = list.map(session => `
+                <div class="student-item ${currentSessionId === session.id ? 'active' : ''}" 
+                   onclick="loadSessionDetails(${session.id}, '${session.student.username}')">
+                    <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                        <h6 class="mb-0 fw-bold text-dark text-truncate" style="font-size: 0.95rem;">${session.student.username || 'Student'}</h6>
+                        <span class="badge ${session.status === 'submitted' ? 'bg-primary-subtle text-primary-emphasis' : 'bg-secondary-subtle text-secondary'} rounded-pill" style="font-size: 0.65rem;">
+                            ${session.status === 'submitted' ? 'Auto-Graded' : session.status}
+                        </span>
+                    </div>
+                    <p class="mb-1 small text-muted text-truncate font-body">${session.exam.title}</p>
+                    <div class="d-flex align-items-center gap-2 mt-2">
+                         <span class="small fw-medium ${session.result ? 'text-success' : 'text-secondary'}" style="font-size: 0.8rem;">
+                            <i class="bi bi-trophy me-1"></i>${session.result ? session.result.percentage_score + '%' : 'Pending Score'}
+                         </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.onbeforeunload = function () {
+            if (hasUnsavedChanges) return "You have unsaved grades. Are you sure you want to leave?";
+        };
+
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                if (currentSessionId) submitAllGrades();
+            }
+        });
+
+        async function loadSessionDetails(sessionId, studentName) {
+            if (hasUnsavedChanges && !confirm("You have unsaved changes. Discard them?")) return;
+
+            currentSessionId = sessionId;
+            draftGrades = {};
+            hasUnsavedChanges = false;
+            updateUnsavedIndicator();
+
+            document.getElementById('emptyState').classList.add('d-none');
+            document.getElementById('gradingInterface').classList.remove('d-none');
+            document.getElementById('headerStudentName').textContent = studentName;
+
+            const questionsContainer = document.getElementById('questionsList');
+            questionsContainer.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>';
+
+            renderSessionsList(sessionsCache); // Re-render to update active state
+
+            try {
+                const session = await API.examinations.getSession(sessionId);
+                document.getElementById('headerExamTitle').textContent = session.exam.title;
+
+                let html = '';
+                totalPointsPossible = 0;
+
+                session.questions.forEach((q, index) => {
+                    const answer = q.answer || {};
+                    // Auto-graded checks
+                    const isGraded = answer.points_earned !== null && answer.points_earned !== undefined;
+                    // No more "needs grading" logic as everything is auto-graded
+
+                    totalPointsPossible += q.points;
+
+                    if (answer.id) {
+                        draftGrades[answer.id] = {
+                            points: isGraded ? parseFloat(answer.points_earned) : 0,
+                            isCorrect: answer.is_correct,
+                            maxPoints: q.points,
+                            isDraft: false
+                        };
+                    }
+
+                    html += `
+                        <div class="question-card" id="q-block-${answer.id}">
+                            <!-- Question Header -->
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <h6 class="fw-bold text-dark mb-0 d-flex gap-3 font-heading" style="line-height: 1.5;">
+                                    <span class="badge bg-light text-secondary border rounded-pill flex-shrink-0" style="height: fit-content;">Q${index + 1}</span>
+                                    <span>${q.question_text}</span>
+                                </h6>
+                                <span class="badge bg-light text-secondary border rounded-pill ms-2 flex-shrink-0">
+                                    ${q.points} pts
+                                </span>
+                            </div>
+
+                            <!-- Student Answer -->
+                            <div class="mb-4">
+                                <div class="student-answer-box">
+                                    <small class="text-uppercase text-muted fw-bold mb-2 d-block" style="font-size: 0.65rem; letter-spacing: 0.5px;">Student Answer</small>
+                                    <div class="text-dark">
+                                        ${q.question_type === 'code'
+                            ? `<pre class="bg-dark text-white p-3 rounded mb-0" style="max-height: 400px; overflow: auto; font-family: 'Consolas', monospace;"><code>${escapeHtml(answer.short_answer_text || '')}</code></pre>`
+                            : (answer.selected_option ? answer.selected_option.option_text : answer.short_answer_text || '<span class="text-muted fst-italic">No answer provided</span>')}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Model Answer Reveal -->
+                            ${q.explanation ? `
+                                <div class="mb-4">
+                                    <div class="p-3 rounded-3 bg-info bg-opacity-10 border border-info border-opacity-25 small text-dark">
+                                        <strong class="text-info-emphasis d-block mb-1">Explanation:</strong>
+                                        ${q.explanation}
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                            <!-- Grading Controls -->
+                            <div class="d-flex align-items-center flex-wrap gap-3 mt-3 pt-3 border-top border-light-subtle">
+                                <div class="btn-group shadow-sm" role="group">
+                                    <button class="btn btn-outline-success btn-sm px-3 ${answer.is_correct === true ? 'active' : ''}" 
+                                        onclick="setDraftGrade(${answer.id}, ${q.points}, true, this)">
+                                        <i class="bi bi-check-lg me-1"></i> Correct
+                                    </button>
+                                    <button class="btn btn-outline-danger btn-sm px-3 ${answer.is_correct === false ? 'active' : ''}" 
+                                        onclick="setDraftGrade(${answer.id}, 0, false, this)">
+                                        <i class="bi bi-x-lg me-1"></i> Incorrect
+                                    </button>
+                                </div>
+                                
+                                <div class="vr opacity-25"></div>
+
+                                <div class="d-flex align-items-center gap-2 bg-light rounded px-2 py-1 border">
+                                    <span class="small text-muted fw-bold text-uppercase" style="font-size: 0.7rem;">Score:</span>
+                                    <input type="number" class="form-control form-control-sm text-center fw-bold border-0 bg-transparent p-0" 
+                                           style="width: 50px;" 
+                                           id="points-${answer.id}" 
+                                           value="${isGraded ? answer.points_earned : ''}" 
+                                           placeholder="-"
+                                           step="0.5" min="0" max="${q.points}"
+                                           onchange="manualDraftGrade(${answer.id}, this.value, ${q.points})">
+                                    <span class="text-muted small">/ ${q.points}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                questionsContainer.innerHTML = html;
+                updateHeaderStats();
+
+            } catch (error) {
+                console.error('Error loading session details:', error);
+                questionsContainer.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+            }
+        }
+
+        function setDraftGrade(answerId, points, isCorrect, btnElement) {
+            const parent = btnElement.parentElement;
+            parent.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+            btnElement.classList.add('active');
+
+            document.getElementById(`points-${answerId}`).value = points;
+            updateDraft(answerId, points, isCorrect);
+        }
+
+        function manualDraftGrade(answerId, points, maxPoints) {
+            let p = parseFloat(points);
+            if (isNaN(p)) p = 0;
+            if (p > maxPoints) p = maxPoints;
+            const isCorrect = p === maxPoints;
+            updateDraft(answerId, p, isCorrect);
+        }
+
+        function updateDraft(answerId, points, isCorrect) {
+            if (!draftGrades[answerId]) draftGrades[answerId] = {};
+
+            draftGrades[answerId].points = points;
+            draftGrades[answerId].isCorrect = isCorrect;
+            draftGrades[answerId].isDraft = true;
+
+            hasUnsavedChanges = true;
+            updateUnsavedIndicator();
+            updateHeaderStats();
+
+            const block = document.getElementById(`q-block-${answerId}`);
+            block.classList.add('bg-success', 'bg-opacity-10');
+            setTimeout(() => block.classList.remove('bg-success', 'bg-opacity-10'), 500);
+        }
+
+        function updateHeaderStats() {
+            let total = 0;
+            let count = 0;
+            let totalCount = Object.keys(draftGrades).length;
+
+            for (const id in draftGrades) {
+                const g = draftGrades[id];
+                total += g.points || 0;
+                if (g.points !== undefined && g.points !== null) count++;
+            }
+
+            document.getElementById('headerScore').textContent = `${total} / ${totalPointsPossible}`;
+            const pct = totalCount > 0 ? (count / totalCount) * 100 : 0;
+            document.getElementById('progressBar').style.width = `${pct}%`;
+            document.getElementById('progressText').textContent = `${count}/${totalCount}`;
+        }
+
+        function updateUnsavedIndicator() {
+            const el = document.getElementById('unsavedChangesInd');
+            if (hasUnsavedChanges) el.classList.remove('d-none');
+            else el.classList.add('d-none');
+        }
+
+        async function submitAllGrades() {
+            if (!hasUnsavedChanges && !confirm("No changes detected. Submit anyway?")) return;
+
+            const btn = document.getElementById('submitBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Saving...';
+            btn.disabled = true;
+
+            let errors = 0;
+            const updates = Object.entries(draftGrades).filter(([_, g]) => g.isDraft);
+
+            if (updates.length === 0) {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                utils.showAlert('No changes to save', 'info');
+                return;
+            }
+
+            for (const [ansId, grade] of updates) {
+                try {
+                    await API.request(`/examinations/sessions/${currentSessionId}/answers/${ansId}/grade/`, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            points: grade.points,
+                            is_correct: grade.isCorrect
+                        })
+                    });
+                    draftGrades[ansId].isDraft = false;
+                } catch (e) {
+                    console.error(e);
+                    errors++;
+                }
+            }
+
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+
+            if (errors === 0) {
+                hasUnsavedChanges = false;
+                updateUnsavedIndicator();
+                utils.showAlert('All grades saved successfully!', 'success');
+            } else {
+                utils.showAlert(`Saved with ${errors} errors. Please retry.`, 'warning');
+            }
+        }
+
+        function toggleStudentSidebar() {
+            const sidebar = document.getElementById('studentSidebar');
+            const btn = document.getElementById('expandSidebarBtn');
+            const main = document.getElementById('mainGradingArea');
+
+            if (sidebar.classList.contains('d-none')) {
+                sidebar.classList.remove('d-none');
+                sidebar.classList.add('col-md-3');
+                main.classList.remove('col-md-12');
+                main.classList.add('col-md-9');
+                btn.classList.add('d-none');
+            } else {
+                sidebar.classList.add('d-none');
+                sidebar.classList.remove('col-md-3');
+                main.classList.add('col-md-12');
+                main.classList.remove('col-md-9');
+                btn.classList.remove('d-none');
+            }
+        }
+
+        async function loadNextSession() {
+            const idx = sessionsCache.findIndex(s => s.id === currentSessionId);
+            if (idx !== -1 && idx < sessionsCache.length - 1) {
+                const next = sessionsCache[idx + 1];
+                loadSessionDetails(next.id, next.student.username);
+            } else {
+                utils.showAlert('No more students in this list.', 'info');
+            }
+        }
+
+        function logout() {
+            window.logout();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Mock logout function if not available
+            if (!window.logout) {
+                window.logout = function () {
+                    localStorage.removeItem('token');
+                    window.location.href = '/frontend/login.html';
+                }
+            }
+
+            if (!utils.isAuthenticated()) {
+                window.location.href = '/frontend/login.html';
+                return;
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const examId = urlParams.get('exam_id');
+            loadSessions(examId);
+
+            // Highlight sidebar nav
+            // Already handled by hardcoded active class
+        });
+    </script>
+</body>
+
+</html>
